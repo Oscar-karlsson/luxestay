@@ -1,9 +1,15 @@
+'use client';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { FaSearch } from 'react-icons/fa';
 import { IoFilterCircleOutline } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
+import SearchBar from './SearchBar';
 
 const TopNavbar = () => {
+    const pathname = usePathname(); // Get the current pathname
+
+
     return (
         <nav className="bg-navbar shadow-bottom  justify-between items-center p-4 md:flex hidden px-8"> {/* Only show on medium screens and larger */}
   <div className="flex items-center">
@@ -20,22 +26,20 @@ const TopNavbar = () => {
           />
         </Link>
       </div>
-          <div className="relative flex flex-grow mx-4">
-  <input
-    type="text"
-    placeholder="Where to?"
-    className="border border-gray-300 rounded-full py-2 px-4 flex-grow focus:outline-none pl-10 pr-10" // Added pr-10
-  />
-  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600" /> {/* Search Icon */}
-  <IoFilterCircleOutline  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 cursor-pointer text-3xl" /> {/* Filter Icon */}
-  </div>
+      
+ {/* Search Bar */}
+ <SearchBar placeholder="Where to?" />
       <div className="flex items-center space-x-4">
-        <Link href="/favorites" className="text-primary-text-color font-semibold hover:text-link-hover transition duration-200 transform hover:scale-105">Favorites</Link>
-        <Link href="/trips" className="text-primary-text-color font-semibold hover:text-link-hover transition duration-200 transform hover:scale-105">Trips</Link>
-        <Link href="/profile" className="text-primary-text-color flex items-center space-x-2"> {/* Updated Profile Link */}
-          <CgProfile className="text-3xl" /> {/* Profile Icon */}
-         
-        </Link>
+       
+                <Link href="/favorites" className={` text-link font-semibold hover:text-link-hover transition duration-200 transform hover:scale-105 ${pathname === '/favorites' ? 'font-extrabold text-accent' : ''}`}>
+                    Favorites
+                </Link>
+                <Link href="/trips" className={`text-link font-semibold hover:text-link-hover transition duration-200 transform hover:scale-105 ${pathname === '/trips' ? 'font-extrabold text-accent' : ''}`}>
+                    Trips
+                </Link>
+                <Link href="/profile" className={`text-primary-text-color flex items-center space-x-2 ${pathname === '/profile' ? 'font-extrabold text-accent' : ''}`}>
+                    <CgProfile className="text-3xl" />
+                </Link>
       </div>
     </nav>
       );

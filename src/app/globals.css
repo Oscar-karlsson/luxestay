@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap');
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Your CSS Variables */
+:root {
+  /* Background Colors */
+  --navbar-color: #F0F0F0;   /* Navbar color */
+  --primary-color: #F5F5F5;  /* Primary background */
+  --accent-color: #068488;   /* Accent color */
+  --card-color: #FFFFFF;     /* Card background */
+
+  /* Text Colors */
+  --primary-text-color: #333333;    /* Primary text */
+  --secondary-text-color: #777777;  /* Secondary text */
+  --link-color: #2C3E50;            /* Link color */
+  --link-hover-color: #3A4E63;      /* Link hover color */
+
+  /* Button Colors */
+  --primary-button-color: #222222;       /* Primary button */
+  --primary-button-hover: #444444;       /* Primary button hover */
+  --secondary-button-color: #DADADA;     /* Secondary button */
+  --secondary-button-hover: #C0C0C0;     /* Secondary button hover */
+  --primary-button-text-color: #FFFFFF;   /* Text on primary button */
+  --secondary-button-text-color: #333333; /* Text on secondary button */
+
+  /* UI Elements */
+  --icon-color: #666666;                /* Icon color */
+  --icon-hover-color: #555555;          /* Icon hover color */
+  --border-color: #999999;              /* Border color */
+  --divider-color: #CCCCCC;             /* Divider color */
+  --success-color: #388E3C;             /* Success color */
+  --error-color: #D32F2F;               /* Error color */
+  --disabled-color: #F0F0F0;            /* Disabled color */
+
+  /* Input Colors */
+  --input-background: #F5F5F5;          /* Input background */
+  --input-border: #CCCCCC;              /* Input border */
+  --input-focus: #1A73E8;               /* Input focus color */
+
+  /* Favorite Colors */
+  --favorite-outline: #FFFFFF;          /* Outline color */
+  --favorite-active: #FABF35;           /* Active favorite color */
+  --favorite-inactive: #CCCCCC;         /* Inactive favorite color */
+
+
+  /* Font Size Variables */
+  --font-size-h1-mobile: 32px;  /* H1 size for mobile */
+  --font-size-h1-desktop: 48px; /* H1 size for desktop */
+  
+  --font-size-h2-mobile: 28px;  /* H2 size for mobile */
+  --font-size-h2-desktop: 40px; /* H2 size for desktop */
+
+  --font-size-h3-mobile: 24px;  /* H3 size for mobile */
+  --font-size-h3-desktop: 32px; /* H3 size for desktop */
+
+  --font-size-h4-mobile: 20px;  /* H4 size for mobile */
+  --font-size-h4-desktop: 28px; /* H4 size for desktop */
+
+  --font-size-h5-mobile: 16px;  /* H5 size for mobile */
+  --font-size-h5-desktop: 22px; /* H5 size for desktop */
+
+  --font-size-b1-mobile: 16px;  /* B1 size for mobile */
+  --font-size-b1-desktop: 18px; /* B1 size for desktop */
+
+  --font-size-b2-mobile: 16px;  /* B2 size for mobile */
+  --font-size-b2-desktop: 18px; /* B2 size for desktop */
+
+  --font-size-b3-mobile: 14px;  /* B3 size for mobile */
+  --font-size-b3-desktop: 16px; /* B3 size for desktop */
+
+  --font-size-b4-mobile: 14px;  /* B4 size for mobile */
+  --font-size-b4-desktop: 16px; /* B4 size for desktop */
+
+    /* Font Weight Variables */
+    --font-weight-semi-bold: 600; /* Semi Bold */
+    --font-weight-regular: 400;    /* Regular */
+    --font-weight-medium: 500;     /* Medium */
+
+}
+
+
+
+/* Font Styles */
+body {
+  color: var(--primary-text-color);
+  background: var(--background-color);
+  font-family: 'Open Sans', sans-serif; /* Use Open Sans for the body */
+}
+
+/* Heading Styles */
+h1, h2, h3, h4, h5 {
+  font-family: 'Playfair Display', serif; /* Use Playfair Display for headings */
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

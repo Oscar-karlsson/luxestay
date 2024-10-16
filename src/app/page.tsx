@@ -9,7 +9,7 @@ const Explore = () => {
    
 
  {/* Search Bar */}
- <div className="sticky top-0 z-50   ">
+ <div className="sticky top-0 z-50 md:hidden">
         <SearchBar placeholder="Where to?" />
       </div>
 
@@ -20,6 +20,7 @@ const Explore = () => {
         {propertyData.map((property) => (
             <PropertyCard
             key={property.id}
+            id={property.id}
             title={property.title}
             location={property.location}
             pricePerNight={property.pricePerNight}

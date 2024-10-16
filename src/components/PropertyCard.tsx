@@ -1,11 +1,13 @@
 'use client';
 import React, { useState, useCallback, useEffect } from 'react';
+import Link from 'next/link';
 import useEmblaCarousel from 'embla-carousel-react';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { IoIosArrowForward,IoIosArrowBack } from "react-icons/io";
 
 
 interface PropertyCardProps {
+  id:number;
   title: string;
   location: string;
   pricePerNight: number;
@@ -15,6 +17,7 @@ interface PropertyCardProps {
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
+  id,
   title,
   location,
   pricePerNight,
@@ -39,11 +42,15 @@ const [atEnd, setAtEnd] = useState(false);
     setAtEnd(!emblaApi.canScrollNext());
   }, [emblaApi]);
 
-  const scrollPrev = useCallback(() => {
+  const scrollPrev = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (emblaApi) emblaApi.scrollPrev();
   }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
+  
+  const scrollNext = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
 
@@ -55,6 +62,7 @@ const [atEnd, setAtEnd] = useState(false);
   }, [emblaApi, onSelect]);
 
   return (
+    <Link href={`/properties/${id}`} passHref>
     <div className="bg-white shadow-lg rounded-lg overflow-hidden relative">
       {/* Embla Carousel for Images */}
       <div className="relative">
@@ -68,7 +76,7 @@ const [atEnd, setAtEnd] = useState(false);
               ))}
             </div>
             {!atStart && <button className="arrow arrow--prev" onClick={scrollPrev}><IoIosArrowBack/></button>}
-            {!atEnd && <button className="arrow arrow--next" onClick={scrollNext}><IoIosArrowForward  /></button>}
+{!atEnd && <button className="arrow arrow--next" onClick={scrollNext}><IoIosArrowForward  /></button>}
           </div>
         ) : (
           <div className="w-full h-48 bg-gray-300 flex items-center justify-center">
@@ -102,20 +110,21 @@ const [atEnd, setAtEnd] = useState(false);
         </div>
       </div>
 
-      {/* Info Section */}
-      <div className="p-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-          <div className="flex items-center">
-            <AiFillStar className="text-yellow-500" /> {/* Single star */}
-            <span className="ml-2 text-gray-700">{rating.toFixed(2)}</span> {/* Numeric rating */}
-          </div>
-        </div>
-        <p className="text-gray-700 mt-2">{location}</p>
-        <p className="text-gray-900 font-semibold mt-2">From €{pricePerNight.toLocaleString()} / night</p>
-      </div>
+{/* Info Section */}
+<div className="p-4">
+  <div className="flex justify-between items-center">
+    <h3 className="font-bold text-primaryText text-h5-mobile sm:text-h5-desktop">{title}</h3>
+    <div className="flex items-center">
+      <AiFillStar className="text-favoriteActive" /> {/* Single star */}
+      <span className="ml-2 text-secondaryText text-b1-mobile sm:text-b1-desktop">{rating.toFixed(2)}</span> {/* Numeric rating */}
     </div>
-  );
+  </div>
+  <p className="text-primaryText font-medium mt-2 text-b1-mobile sm:text-b1-desktop">{location}</p>
+  <p className="text-secondaryText font-regular mt-2 text-b4-mobile sm:text-b4-desktop">From €{pricePerNight.toLocaleString()} / night</p>
+</div>
+</div>
+</Link>
+);
 };
 
 export default PropertyCard;

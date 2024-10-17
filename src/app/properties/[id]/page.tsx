@@ -4,6 +4,8 @@ import propertyData from '../../../data/properties.json';
 import { AiFillStar } from 'react-icons/ai';
 import { IoIosArrowBack } from "react-icons/io";
 import FavoriteStar from '@/components/FavoriteStar';
+import BookingBarSmall from '@/components/BookingBarSmall';
+import BookingBoxLarge from '@/components/BookingBoxLarge';
 
 const PropertyDetail = () => {
     const { id } = useParams();  // Get the dynamic id from the URL
@@ -59,8 +61,22 @@ const PropertyDetail = () => {
                     </div>
                 </div>
                 <p className="text-gray-700 mt-2">{property.details.description}</p>
-                <p className="text-sm text-gray-500">Hosted by {property.details.hostedBy}</p>
-                <button className="bg-accent-color text-white py-2 px-4 rounded mt-4">Reserve</button>
+                <p className="text-sm text-gray-500 flex items-center">
+  <img
+    src="/profile.png" // Path to your placeholder image in the public folder
+    alt="Profile"
+    className="w-10 h-10 rounded-full mr-2"
+  />
+  Hosted by {property.details.hostedBy}
+</p>
+               {/* Booking Bar for Small Screens and Booking Box for Large Screens */}
+<div className="block md:hidden fixed bottom-0 left-0 w-full z-50">
+  <BookingBarSmall pricePerNight={property.pricePerNight} />
+</div>
+<div className="hidden md:block">
+  <BookingBoxLarge pricePerNight={property.pricePerNight} />
+  
+</div>
             </div>
 
             {/* Map Section */}

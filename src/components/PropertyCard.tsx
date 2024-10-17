@@ -5,6 +5,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { IoIosArrowForward,IoIosArrowBack } from "react-icons/io";
 import FavoriteStar from './FavoriteStar';
+import { formatPrice } from '@/utils/formatPrice';
 
 
 interface PropertyCardProps {
@@ -62,6 +63,9 @@ const [atEnd, setAtEnd] = useState(false);
     emblaApi.on('select', onSelect);
   }, [emblaApi, onSelect]);
 
+
+  const formattedPrice = formatPrice(pricePerNight); // Use the utility function
+
   return (
     <Link href={`/properties/${id}`} passHref>
     <div className="bg-white shadow-lg rounded-lg overflow-hidden relative">
@@ -114,7 +118,7 @@ const [atEnd, setAtEnd] = useState(false);
     </div>
   </div>
   <p className="text-primaryText font-medium mt-2 text-b1-mobile sm:text-b1-desktop">{location}</p>
-  <p className="text-secondaryText font-regular mt-2 text-b4-mobile sm:text-b4-desktop">From €{pricePerNight.toLocaleString()} / night</p>
+  <p className="text-secondaryText font-regular mt-2 text-b4-mobile sm:text-b4-desktop">From {formattedPrice} / night</p>
 </div>
 </div>
 </Link>

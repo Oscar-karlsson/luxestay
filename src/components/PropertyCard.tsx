@@ -4,6 +4,7 @@ import Link from 'next/link';
 import useEmblaCarousel from 'embla-carousel-react';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { IoIosArrowForward,IoIosArrowBack } from "react-icons/io";
+import FavoriteStar from './FavoriteStar';
 
 
 interface PropertyCardProps {
@@ -97,16 +98,9 @@ const [atEnd, setAtEnd] = useState(false);
   ))}
 </div>
 
-        {/* Favorite Star Icon */}
-        <div className="absolute top-2 right-2">
-          <span className="relative">
-            {isFavorite ? (
-              <AiFillStar className="text-3xl text-favoriteActive absolute" />  // Filled favorite star
-            ) : (
-              <AiFillStar className="text-3xl text-favoriteInactive absolute" />  // Inactive favorite star
-            )}
-            <AiOutlineStar className="text-3xl text-favoriteOutline relative" /> {/* Outlined star */}
-          </span>
+    {/* Favorite Star Icon */}
+    <div className="absolute top-2 right-2">
+          <FavoriteStar isFavorite={isFavorite} /> {/* Using your reusable component */}
         </div>
       </div>
 

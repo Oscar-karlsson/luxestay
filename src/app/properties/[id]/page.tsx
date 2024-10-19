@@ -232,17 +232,26 @@ const PropertyDetail = () => {
     return (
         <>
         {/* Custom modal for small screens */}
-        {isSmallScreen && !isShowMoreModalOpen && (
+        {isSmallScreen && (
             <CustomModal isOpen={true} onClose={() => router.back()}>
                 {content}
+                {/* Show More Modal within CustomModal */}
+                {isShowMoreModalOpen && (
+                    <ShowMoreModal
+                        isOpen={isShowMoreModalOpen}
+                        onClose={() => setIsShowMoreModalOpen(false)}
+                    >
+                        {modalContent}
+                    </ShowMoreModal>
+                )}
             </CustomModal>
         )}
 
         {/* Main content for larger screens */}
         {!isSmallScreen && content}
 
-        {/* Show More Modal - always available for both screen sizes */}
-        {isShowMoreModalOpen && (
+        {/* Show More Modal - for larger screens only */}
+        {!isSmallScreen && isShowMoreModalOpen && (
             <ShowMoreModal
                 isOpen={isShowMoreModalOpen}
                 onClose={() => setIsShowMoreModalOpen(false)}
@@ -251,7 +260,7 @@ const PropertyDetail = () => {
             </ShowMoreModal>
         )}
     </>
-);
+    );
 };
 
 export default PropertyDetail;

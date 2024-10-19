@@ -48,44 +48,59 @@
   
 
 
-  /* Show More Modal Overlay */
+/* Show More Modal Overlay */
 .show-more-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 50;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100; /* Higher than the CustomModal */
+}
+
+/* Modal for Small Screens */
+.modal-mobile {
+    background-color: rgba(0, 0, 0, 0.3); /* Lighter transparent background for mobile */
+    z-index: 1100;
 }
 
 /* Show More Modal Content */
 .show-more-modal-content {
-  background-color: var(--primary-color); /* Use your custom color */
-  padding: 20px;
-  max-width: 500px; /* Modal size */
-  width: 100%;
-  height: auto; /* Auto height */
-  border-radius: 8px; /* Optional rounded corners */
-  outline: none;
-  position: relative;
-  overflow: auto; /* Ensure scrollable content */
+    background-color: var(--primary-color); /* Use your custom background color */
+    padding: 20px;
+    max-width: 500px; /* Modal size */
+    width: 90%; /* Adjust the width for smaller screens */
+    height: auto; /* Auto height */
+    border-radius: 8px; /* Rounded corners */
+    outline: none;
+    position: relative;
+    overflow-y: auto; /* Ensure content inside modal can scroll */
+    max-height: 80vh; /* Limit modal height */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Add shadow */
+    z-index: 1100; /* Match the overlay */
 }
 
-/* Show More Modal Body */
+/* Modal Body */
 .show-more-modal-body {
-  margin-top: 0;
+    margin-top: 0;
+    overflow-y: auto; /* Allow scrolling inside the modal */
 }
 
 .show-more-modal-body ul {
-  padding: 0;
+    padding: 0;
 }
 
 .show-more-modal-body li {
-  list-style: none;
-  padding: 8px 0;
-  border-bottom: 1px solid #ddd;
+    list-style: none;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Custom Modal (Detail Page) */
+.modal-overlay {
+    z-index: 1000; /* Lower than Show More Modal */
 }

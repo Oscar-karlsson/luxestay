@@ -8,6 +8,7 @@ import {
   UserButton,
 } from '@clerk/nextjs';  
 import "./globals.css";
+import './modalStyles.css'
 import BottomNavbar from "@/components/BottomNavbar";
 import TopNavbar from "@/components/TopNavbar";
 

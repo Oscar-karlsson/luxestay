@@ -7,7 +7,7 @@ interface BookingBoxLargeProps {
 
 const BookingBoxLarge: React.FC<BookingBoxLargeProps> = ({ pricePerNight }) => {
   return (
-    <div className="bg-white shadow-md p-6 rounded-lg">
+    <div className="bg-white shadow-md p-6 rounded-lg ">
       <div className="mb-4 text-xl font-bold">{formatPrice(pricePerNight)} / night</div>  {/* Use formatPrice */}
       <div className="mb-4 grid grid-cols-2 gap-4">
         <div>

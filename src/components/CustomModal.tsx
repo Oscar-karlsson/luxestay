@@ -1,16 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Modal from 'react-modal';
-
-// Set the root element for the modal, required for accessibility.
-Modal.setAppElement('#__next'); // If you are using Next.js, '#__next' is the app root.
 
 interface CustomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode; // Content to be displayed inside the modal
+  children: React.ReactNode; 
 }
 
 const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onClose, children }) => {
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const nextElement = document.getElementById('__next');
+      if (nextElement) {
+        Modal.setAppElement(nextElement); // Set app element only on the client side
+      }
+    }
+  }, []);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -18,10 +25,10 @@ const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onClose, children }) 
       contentLabel="Example Modal"
       overlayClassName="modal-overlay"
       className="modal-content"
-      closeTimeoutMS={300} // Optional, controls the animation time
+      closeTimeoutMS={300}
     >
       <div className="modal-header">
-        <button onClick={onClose} className="close-btn">X</button>
+       
       </div>
       <div className="modal-body">
         {children}

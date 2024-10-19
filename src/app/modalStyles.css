@@ -1,0 +1,91 @@
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    background-color: var(--primary-color);
+    padding: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    border-radius: 0; 
+    outline: none;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto; /* Ensure scrollable content */
+  }
+  
+  /* Modal Header */
+  .modal-header {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  /* Close Button */
+  .close-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .modal-body {
+    margin-top: 0px;
+  }
+  
+
+
+  /* Show More Modal Overlay */
+.show-more-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+/* Show More Modal Content */
+.show-more-modal-content {
+  background-color: var(--primary-color); /* Use your custom color */
+  padding: 20px;
+  max-width: 500px; /* Modal size */
+  width: 100%;
+  height: auto; /* Auto height */
+  border-radius: 8px; /* Optional rounded corners */
+  outline: none;
+  position: relative;
+  overflow: auto; /* Ensure scrollable content */
+}
+
+/* Show More Modal Body */
+.show-more-modal-body {
+  margin-top: 0;
+}
+
+.show-more-modal-body ul {
+  padding: 0;
+}
+
+.show-more-modal-body li {
+  list-style: none;
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
+}

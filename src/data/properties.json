@@ -16,7 +16,7 @@
       "hostedBy": "John Doe",
       "description": "This luxurious villa offers stunning views, a private tennis court, and spacious rooms perfect for families or groups.",
       "address": "123 Marbella St, Spain",
-      "mapUrl": "/map/marbella.jpg",
+      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
       "features": ["Wi-Fi", "Private Pool", "Tennis Court", "Parking", "Pets Allowed"],
       "houseRules": {
         "checkIn": "2:00 PM",
@@ -54,7 +54,159 @@
       "hostedBy": "Jane Smith",
       "description": "Villa Ocean Pearl is a modern beachfront property offering stunning views of the Mediterranean Sea.",
       "address": "456 Ibiza Beach Rd, Spain",
-      "mapUrl": "/map/ibiza.jpg",
+      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
+      "features": ["Wi-Fi", "Hot tub", "Beach access", "Private Pool"],
+      "houseRules": {
+        "checkIn": "3:00 PM",
+        "checkOut": "12:00 PM",
+        "security": "No security cameras"
+      },
+      "safetyFeatures": ["Smoke alarm", "Carbon monoxide detector"],
+      "services": ["Daily housekeeping", "Private chef"],
+      "reviews": [
+        {
+          "name": "Chris Lee",
+          "review": "The perfect getaway. The views are breathtaking and the villa is very private."
+        },
+        {
+          "name": "Sara Wilson",
+          "review": "Absolutely loved the villa, especially the beachfront access and the hot tub."
+        }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "title": "Buccara Villa El Nido",
+    "location": "Marbella, Spain",
+    "pricePerNight": 9700,
+    "rating": 5.0,
+    "images": [
+      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/3796f37b-1957-4df7-881e-7c3e10b52794.jpeg?im_w=1200",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/2880d61b-59d1-46f0-a3b7-a9a75879471e.jpeg?im_w=1200",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/c8c2e6b0-d08b-4011-8d6b-baac513d23d6.jpeg?im_w=1200",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/106aefc2-ac87-4e0c-9d38-b61711fdc1af.jpeg?im_w=1200"
+    ],
+    "isFavorite": true,
+    "details": {
+      "hostedBy": "John Doe",
+      "description": "This luxurious villa offers stunning views, a private tennis court, and spacious rooms perfect for families or groups.",
+      "address": "123 Marbella St, Spain",
+      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
+      "features": ["Wi-Fi", "Private Pool", "Tennis Court", "Parking", "Pets Allowed"],
+      "houseRules": {
+        "checkIn": "2:00 PM",
+        "checkOut": "11:00 AM",
+        "security": "Security cameras on property"
+      },
+      "safetyFeatures": ["Fire extinguisher", "Smoke alarm"],
+      "services": ["Private chef", "In-house spa", "Daily housekeeping"],
+      "reviews": [
+        {
+          "name": "Alice Smith",
+          "review": "This villa is incredible! The amenities and location were perfect for our family vacation."
+        },
+        {
+          "name": "Mark Johnson",
+          "review": "Amazing villa, the tennis court was a great addition and the service was top-notch."
+        }
+      ]
+    }
+  },
+  {
+    "id": 4,
+    "title": "Villa Ocean Pearl",
+    "location": "Ibiza, Spain",
+    "pricePerNight": 8500,
+    "rating": 4.9,
+    "images": [
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1236685254994899220/original/5b793d25-86d7-4e97-ac07-b30b90f223d2.jpeg?im_w=1200",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/3c676cbf-55fb-4a36-86c3-bb2ecab0209d.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/4572638d-05b7-4d69-9ddb-5d48875e79b3.jpeg?im_w=1200",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/0ec83020-7882-4a6c-9962-e589978af359.jpeg?im_w=1200"
+    ],
+    "isFavorite": false,
+    "details": {
+      "hostedBy": "Jane Smith",
+      "description": "Villa Ocean Pearl is a modern beachfront property offering stunning views of the Mediterranean Sea.",
+      "address": "456 Ibiza Beach Rd, Spain",
+      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
+      "features": ["Wi-Fi", "Hot tub", "Beach access", "Private Pool"],
+      "houseRules": {
+        "checkIn": "3:00 PM",
+        "checkOut": "12:00 PM",
+        "security": "No security cameras"
+      },
+      "safetyFeatures": ["Smoke alarm", "Carbon monoxide detector"],
+      "services": ["Daily housekeeping", "Private chef"],
+      "reviews": [
+        {
+          "name": "Chris Lee",
+          "review": "The perfect getaway. The views are breathtaking and the villa is very private."
+        },
+        {
+          "name": "Sara Wilson",
+          "review": "Absolutely loved the villa, especially the beachfront access and the hot tub."
+        }
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "title": "Buccara Villa El Nido",
+    "location": "Marbella, Spain",
+    "pricePerNight": 9700,
+    "rating": 5.0,
+    "images": [
+      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/3796f37b-1957-4df7-881e-7c3e10b52794.jpeg?im_w=1200",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/2880d61b-59d1-46f0-a3b7-a9a75879471e.jpeg?im_w=1200",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/c8c2e6b0-d08b-4011-8d6b-baac513d23d6.jpeg?im_w=1200",
+      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/106aefc2-ac87-4e0c-9d38-b61711fdc1af.jpeg?im_w=1200"
+    ],
+    "isFavorite": true,
+    "details": {
+      "hostedBy": "John Doe",
+      "description": "This luxurious villa offers stunning views, a private tennis court, and spacious rooms perfect for families or groups.",
+      "address": "123 Marbella St, Spain",
+      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
+      "features": ["Wi-Fi", "Private Pool", "Tennis Court", "Parking", "Pets Allowed"],
+      "houseRules": {
+        "checkIn": "2:00 PM",
+        "checkOut": "11:00 AM",
+        "security": "Security cameras on property"
+      },
+      "safetyFeatures": ["Fire extinguisher", "Smoke alarm"],
+      "services": ["Private chef", "In-house spa", "Daily housekeeping"],
+      "reviews": [
+        {
+          "name": "Alice Smith",
+          "review": "This villa is incredible! The amenities and location were perfect for our family vacation."
+        },
+        {
+          "name": "Mark Johnson",
+          "review": "Amazing villa, the tennis court was a great addition and the service was top-notch."
+        }
+      ]
+    }
+  },
+  {
+    "id": 6,
+    "title": "Villa Ocean Pearl",
+    "location": "Ibiza, Spain",
+    "pricePerNight": 8500,
+    "rating": 4.9,
+    "images": [
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1236685254994899220/original/5b793d25-86d7-4e97-ac07-b30b90f223d2.jpeg?im_w=1200",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/3c676cbf-55fb-4a36-86c3-bb2ecab0209d.jpeg?im_w=720",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/4572638d-05b7-4d69-9ddb-5d48875e79b3.jpeg?im_w=1200",
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/0ec83020-7882-4a6c-9962-e589978af359.jpeg?im_w=1200"
+    ],
+    "isFavorite": false,
+    "details": {
+      "hostedBy": "Jane Smith",
+      "description": "Villa Ocean Pearl is a modern beachfront property offering stunning views of the Mediterranean Sea.",
+      "address": "456 Ibiza Beach Rd, Spain",
+      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
       "features": ["Wi-Fi", "Hot tub", "Beach access", "Private Pool"],
       "houseRules": {
         "checkIn": "3:00 PM",

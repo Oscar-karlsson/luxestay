@@ -1,4 +1,5 @@
 'use client';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import propertyData from '../../../data/properties.json'; 
 import { AiFillStar } from 'react-icons/ai';
@@ -6,24 +7,82 @@ import { IoIosArrowBack } from "react-icons/io";
 import FavoriteStar from '@/components/FavoriteStar';
 import BookingBarSmall from '@/components/BookingBarSmall';
 import BookingBoxLarge from '@/components/BookingBoxLarge';
+import CustomModal from '@/components/CustomModal';
+import ShowMoreModal from '@/components/ShowMoreModal';
+
+type ShowMoreSection = 'description' | 'features' | 'houseRules';
 
 const PropertyDetail = () => {
-    const { id } = useParams();  // Get the dynamic id from the URL
-    const router = useRouter();  // Use Next.js router
-
-    // Convert id to number (since id in JSON is a number)
+    const { id } = useParams();
+    const router = useRouter();
+    const [isSmallScreen, setIsSmallScreen] = useState(false);
+    const [isShowMoreModalOpen, setIsShowMoreModalOpen] = useState(false);
+    const [modalContent, setModalContent] = useState<React.ReactNode>(null);
     const propertyId = parseInt(id as string);
-
-    // Find the property based on id
     const property = propertyData.find((prop) => prop.id === propertyId);
 
-    // If no property is found with that id, return a fallback message
-    if (!property) {
-      return <div>Property not found</div>;
-    }
+    // Set initial "Show More" state for different sections
+    const [showMore, setShowMore] = useState({
+        description: false,
+        features: false,
+        houseRules: false
+    });
 
-    return (
-        <div className="md:max-w-3xl md:mx-auto">
+    // Control how many items to show initially for each section
+    const maxItemsToShow = {
+        description: 150,  // Number of characters for description (optional, you can remove this if not needed)
+        features: 3,       // Show 3 features initially
+        houseRules: 2      // Show 2 house rules initially
+    };
+
+    // Function to set the content for the modal based on the section
+    const handleShowMoreToggle = (section: ShowMoreSection) => {
+        let content;
+    
+        if (section === 'features') {
+            content = (
+                <ul className="space-y-1 mt-2">
+                    {property.details.features.map((feature, index) => (
+                        <li key={index} className="text-gray-600">{feature}</li>
+                    ))}
+                </ul>
+            );
+        } else if (section === 'houseRules') {
+            content = (                                                                 
+                <ul className="space-y-1 mt-2">
+                    {Object.entries(property.details.houseRules).map(([key, value], index) => (
+                        <li key={index} className="text-gray-600">{`${key}: ${value}`}</li>
+                    ))}
+                </ul>
+            );
+        } else if (section === 'description') {
+            content = (
+                <p className="text-gray-700 mt-2">
+                    {property.details.description}
+                </p>
+            );
+        }
+    
+        setModalContent(content);  // Set the content for the modal
+        setIsShowMoreModalOpen(true);  // Open the modal
+    };
+
+    if (!property) return <div>Property not found</div>;
+
+    // Check screen size on component mount
+    useEffect(() => {
+        const handleResize = () => {
+            setIsSmallScreen(window.innerWidth < 768);
+        };
+
+        handleResize();  // Run the check when the component mounts
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const content = (
+        <div className="md:max-w-5xl md:mx-auto pb-16">
             {/* Title for larger screens */}
             <div className="hidden md:block text-2xl font-bold mb-4 md:mt-4">
                 {property.title}
@@ -31,102 +90,168 @@ const PropertyDetail = () => {
 
             {/* Property Image Section */}
             <div className="relative mb-4">
-                {/* Add the back button within this div to position it on the image */}
-                <button 
-                    className="absolute top-4 left-4 flex items-center space-x-2 text-white bg-black/50 p-2 rounded-full" 
+                <button
+                    className="absolute top-4 left-4 flex items-center space-x-2 text-white bg-black/50 p-2 rounded-full"
                     onClick={() => router.back()}>
                     <IoIosArrowBack className="text-2xl" />
                 </button>
-                <img 
-                    src={property.images[0]}  // Use the first image from the property
-                    alt={property.title} 
-                    className="w-full h-72 object-cover"
+                <img
+                    src={property.images[0]}
+                    alt={property.title}
+                    className="w-full h-auto object-cover"
                 />
-                {/* Favorite Star Icon on the image */}
                 <div className="absolute top-4 right-4">
                     <FavoriteStar isFavorite={property.isFavorite} />
                 </div>
             </div>
 
-            {/* Property Details Section */}
-            <div className="p-4 md:p-0 space-y-4">
-                {/* Title for small screens (hidden on large screens) */}
-                <h1 className="text-2xl font-bold md:hidden">{property.title}</h1>
+            {/* Grid Layout for Content and Booking Box on Large Screens */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Property Details Section */}
+                <div className="space-y-4 p-4">
+                    <h1 className="text-2xl font-bold md:hidden">{property.title}</h1>
 
-                <div className="flex items-center space-x-2">
-                    <span>{property.location}</span>
-                    <div className="flex items-center">
-                        <AiFillStar className="text-yellow-500" />
-                        <span className="ml-1 text-gray-600">{property.rating.toFixed(1)}</span>
+                    <div className="flex items-center space-x-2">
+                        <span>{property.location}</span>
+                        <div className="flex items-center">
+                            <AiFillStar className="text-yellow-500" />
+                            <span className="ml-1 text-gray-600">{property.rating.toFixed(1)}</span>
+                        </div>
+                    </div>
+
+                    <p className="text-gray-700 mt-2">{property.details.description}</p>
+                    {/* Show More button for description */}
+                    {property.details.description.length > maxItemsToShow.description && (
+                        <button
+                            onClick={() => handleShowMoreToggle('description')}
+                            className="text-blue-500 underline mt-2"
+                        >
+                            Show More
+                        </button>
+                    )}
+
+                    {/* Divider */}
+                    <hr className="block md:hidden my-4 border-t border-divider" />
+                    <p className="text-sm text-gray-500 flex items-center">
+                        <img
+                            src="/profile.png"
+                            alt="Profile"
+                            className="w-10 h-10 rounded-full mr-2"
+                        />
+                        Hosted by {property.details.hostedBy}
+                    </p>
+
+                    {/* Divider */}
+                    <hr className="block md:hidden my-4 border-t border-divider" />
+
+                    {/* Map Section */}
+                    <div className="mt-6">
+                        <h2 className="text-lg font-bold">Where you'll be</h2>
+                        <img src={property.details.mapUrl} alt="Map" className="w-full h-48 object-cover mt-2" />
+                    </div>
+
+                    {/* Divider */}
+                    <hr className="block md:hidden my-4 border-t border-divider" />
+
+                    {/* What this place offers */}
+                    <div className="mt-6">
+                        <h2 className="text-lg font-bold">What this place offers</h2>
+                        <ul className="space-y-1 mt-2">
+                            {property.details.features
+                                .slice(0, showMore.features ? property.details.features.length : maxItemsToShow.features)
+                                .map((feature, index) => (
+                                    <li key={index} className="text-gray-600">{feature}</li>
+                                ))
+                            }
+                        </ul>
+                        {property.details.features.length > maxItemsToShow.features && (
+                            <button
+                                onClick={() => handleShowMoreToggle('features')}
+                                className="text-blue-500 underline mt-2"
+                            >
+                                {showMore.features ? "Show Less" : "Show More"}
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Divider */}
+                    <hr className="block md:hidden my-4 border-t border-divider" />
+
+                    {/* House Rules */}
+                    <div className="mt-6">
+                        <h2 className="text-lg font-bold">House rules</h2>
+                        <ul className="space-y-1 mt-2">
+                            {Object.entries(property.details.houseRules)
+                                .slice(0, showMore.houseRules ? Object.keys(property.details.houseRules).length : maxItemsToShow.houseRules)
+                                .map(([key, value], index) => (
+                                    <li key={index} className="text-gray-600">{`${key}: ${value}`}</li>
+                                ))
+                            }
+                        </ul>
+                        {Object.keys(property.details.houseRules).length > maxItemsToShow.houseRules && (
+                            <button
+                                onClick={() => handleShowMoreToggle('houseRules')}
+                                className="text-blue-500 underline mt-2"
+                            >
+                                {showMore.houseRules ? "Show Less" : "Show More"}
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Divider */}
+                    <hr className="block md:hidden my-4 border-t border-divider" />
+
+                    {/* Reviews */}
+                    <div className="mt-6">
+                        <h2 className="text-lg font-bold">Reviews</h2>
+                        <ul className="space-y-4 mt-2">
+                            {property.details.reviews.map((review, index) => (
+                                <li key={index} className="bg-gray-100 p-4 rounded">
+                                    <p className="font-bold">{review.name}</p>
+                                    <p className="text-gray-600 mt-1">{review.review}</p>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
-                <p className="text-gray-700 mt-2">{property.details.description}</p>
-                <p className="text-sm text-gray-500 flex items-center">
-  <img
-    src="/profile.png" // Path to your placeholder image in the public folder
-    alt="Profile"
-    className="w-10 h-10 rounded-full mr-2"
-  />
-  Hosted by {property.details.hostedBy}
-</p>
-               {/* Booking Bar for Small Screens and Booking Box for Large Screens */}
-<div className="block md:hidden fixed bottom-0 left-0 w-full z-50">
-  <BookingBarSmall pricePerNight={property.pricePerNight} />
-</div>
-<div className="hidden md:block">
-  <BookingBoxLarge pricePerNight={property.pricePerNight} />
-  
-</div>
+
+                {/* Booking Box for Large Screens */}
+                <div className="hidden md:block md:sticky md:top-20">
+                    <BookingBoxLarge pricePerNight={property.pricePerNight} />
+                </div>
             </div>
 
-            {/* Map Section */}
-            <div className="p-4 md:p-0 mt-6">
-                <h2 className="text-lg font-bold">Where you'll be</h2>
-                <img src={property.details.mapUrl} alt="Map" className="w-full h-48 object-cover mt-2" />
-            </div>
-
-            {/* What this place offers */}
-            <div className="p-4 md:p-0 mt-6">
-                <h2 className="text-lg font-bold">What this place offers</h2>
-                <ul className="space-y-1 mt-2">
-                    {property.details.features.map((feature, index) => (
-                        <li key={index} className="text-gray-600">{feature}</li>
-                    ))}
-                </ul>
-            </div>
-
-            {/* House Rules, Safety, Property Features */}
-            <div className="p-4 md:p-0 mt-6">
-                <h2 className="text-lg font-bold">House rules</h2>
-                <p className="text-gray-600 mt-1">Check-in: {property.details.houseRules.checkIn}</p>
-                <p className="text-gray-600">Check-out: {property.details.houseRules.checkOut}</p>
-                <p className="text-gray-600">Security: {property.details.houseRules.security}</p>
-            </div>
-
-            <div className="p-4 md:p-0 mt-6">
-                <h2 className="text-lg font-bold">Safety features</h2>
-                <ul className="space-y-1 mt-2">
-                    {property.details.safetyFeatures.map((safetyFeature, index) => (
-                        <li key={index} className="text-gray-600">{safetyFeature}</li>
-                    ))}
-                </ul>
-            </div>
-
-            {/* Reviews */}
-            <div className="p-4 md:p-0 mt-6">
-                <h2 className="text-lg font-bold">Reviews</h2>
-                <ul className="space-y-4 mt-2">
-                    {property.details.reviews.map((review, index) => (
-                        <li key={index} className="bg-gray-100 p-4 rounded">
-                            <p className="font-bold">{review.name}</p>
-                            <p className="text-gray-600 mt-1">{review.review}</p>
-                        </li>
-                    ))}
-                </ul>
-                <button className="mt-4 py-2 px-4 bg-gray-200 text-gray-700 rounded">Show all reviews</button>
+            {/* Booking Bar for Small Screens */}
+            <div className="block md:hidden fixed bottom-0 left-0 right-0 z-50">
+                <BookingBarSmall pricePerNight={property.pricePerNight} />
             </div>
         </div>
     );
+
+
+    return (
+        <>
+        {/* Custom modal for small screens */}
+        {isSmallScreen && !isShowMoreModalOpen && (
+            <CustomModal isOpen={true} onClose={() => router.back()}>
+                {content}
+            </CustomModal>
+        )}
+
+        {/* Main content for larger screens */}
+        {!isSmallScreen && content}
+
+        {/* Show More Modal - always available for both screen sizes */}
+        {isShowMoreModalOpen && (
+            <ShowMoreModal
+                isOpen={isShowMoreModalOpen}
+                onClose={() => setIsShowMoreModalOpen(false)}
+            >
+                {modalContent}
+            </ShowMoreModal>
+        )}
+    </>
+);
 };
 
 export default PropertyDetail;

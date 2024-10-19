@@ -37,6 +37,17 @@
           "review": "Amazing villa, the tennis court was a great addition and the service was top-notch.",
           "date": "2024-09-21",
           "ranking": 4
+        },      {
+          "name": "Alice Smith",
+          "review": "This villa is incredible! The amenities and location were perfect for our family vacation.",
+          "date": "2024-10-01",
+          "ranking": 5
+        },
+        {
+          "name": "Mark Johnson",
+          "review": "Amazing villa, the tennis court was a great addition and the service was top-notch.",
+          "date": "2024-09-21",
+          "ranking": 4
         }
       ]
     }

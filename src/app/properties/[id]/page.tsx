@@ -208,22 +208,26 @@ const PropertyDetail = () => {
 {/* Reviews Section */}
 <div className="mt-6">
   <h2 className="text-lg font-bold">Reviews</h2>
-  <div className="embla review-slider" ref={emblaRef}>
-    <div className="embla__container">
-      {property.details.reviews.map((review, index) => (
-        <div className="embla__slide" key={index}>
-          <ReviewCard
-            name={review.name}
-            review={review.review}
-            date={review.date}
-            ranking={review.ranking}
-            onShowMore={(fullReview) => {
+
+  {/* Restrict the slider to the content width */}
+  <div className="overflow-hidden w-full max-w-5xl mx-auto"> {/* Ensures the slider is within the container */}
+    <div className="embla review-slider" ref={emblaRef}>
+      <div className="embla__container">
+        {property.details.reviews.map((review, index) => (
+          <div className="embla__slide" key={index}>
+            <ReviewCard
+              name={review.name}
+              review={review.review}
+              date={review.date}
+              ranking={review.ranking}
+              onShowMore={(fullReview) => {
                 setModalContent(fullReview); // Set the content
                 setIsShowMoreModalOpen(true); // Open the modal
               }}
-          />
-        </div>
-      ))}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 </div>

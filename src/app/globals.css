@@ -153,3 +153,13 @@ h1, h2, h3, h4, h5 {
 }
 
 
+.review-slider .embla__container {
+  display: flex; /* Flexbox for sliding items */
+  transition: transform 0.3s ease; /* Smooth transition when sliding */
+}
+
+.review-slider .embla__slide {
+  min-width: 100%; /* Each slide takes up the full width */
+  flex: 0 0 100%; /* Ensures each slide occupies the full width */
+  padding: 10px; /* Optional: add spacing around the slides */
+}

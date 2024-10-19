@@ -1,8 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, ReactNode } from 'react';
 import Modal from 'react-modal';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
-const ShowMoreModal = ({ isOpen, onClose, children }) => {
+interface ShowMoreModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    children: ReactNode;
+  }
+  
+  const ShowMoreModal: React.FC<ShowMoreModalProps> = ({ isOpen, onClose, children }) => {
   const modalRef = useRef(null);
 
   useEffect(() => {

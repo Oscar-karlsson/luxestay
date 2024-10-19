@@ -10,6 +10,7 @@ import BookingBoxLarge from '@/components/BookingBoxLarge';
 import CustomModal from '@/components/CustomModal';
 import ShowMoreModal from '@/components/ShowMoreModal';
 import ReviewCard from '@/components/ReviewCard';
+import EmblaCarouselReact from 'embla-carousel-react';
 
 type ShowMoreSection = 'description' | 'features' | 'houseRules';
 
@@ -21,6 +22,7 @@ const PropertyDetail = () => {
     const [modalContent, setModalContent] = useState<React.ReactNode>(null);
     const propertyId = parseInt(id as string);
     const property = propertyData.find((prop) => prop.id === propertyId);
+    const [emblaRef, emblaApi] = EmblaCarouselReact({ loop: false, slidesToScroll: 1 });
 
     // Set initial "Show More" state for different sections
     const [showMore, setShowMore] = useState({
@@ -37,34 +39,32 @@ const PropertyDetail = () => {
     };
 
     // Function to set the content for the modal based on the section
-    const handleShowMoreToggle = (section: ShowMoreSection) => {
-        let content;
+    const handleShowMoreToggle = (section: ShowMoreSection | 'review', content: string = '') => {
+        let modalContent;
     
         if (section === 'features') {
-            content = (
+            modalContent = (
                 <ul className="space-y-1 mt-2">
-                    {property.details.features.map((feature, index) => (
+                    {property?.details?.features?.map((feature, index) => (
                         <li key={index} className="text-gray-600">{feature}</li>
                     ))}
                 </ul>
             );
         } else if (section === 'houseRules') {
-            content = (                                                                 
+            modalContent = (
                 <ul className="space-y-1 mt-2">
-                    {Object.entries(property.details.houseRules).map(([key, value], index) => (
+                    {Object.entries(property?.details?.houseRules || {}).map(([key, value], index) => (
                         <li key={index} className="text-gray-600">{`${key}: ${value}`}</li>
                     ))}
                 </ul>
             );
         } else if (section === 'description') {
-            content = (
-                <p className="text-gray-700 mt-2">
-                    {property.details.description}
-                </p>
-            );
+            modalContent = <p className="text-gray-700 mt-2">{property?.details?.description}</p>;
+        } else if (section === 'review') {
+            modalContent = <p className="text-gray-700 mt-2">{content}</p>;
         }
     
-        setModalContent(content);  // Set the content for the modal
+        setModalContent(modalContent);  // Set the content for the modal
         setIsShowMoreModalOpen(true);  // Open the modal
     };
 
@@ -125,13 +125,13 @@ const PropertyDetail = () => {
 
                     <p className="text-gray-700 mt-2">{property?.details?.description}</p>
                     {/* Show More button for description */}
-                    {property.details.description.length > maxItemsToShow.description && (
-                        <button
-                            onClick={() => handleShowMoreToggle('description')}
-                            className="text-blue-500 underline mt-2"
-                        >
-                            Show More
-                        </button>
+                    {property?.details?.description.length > maxItemsToShow.description && (
+                <button
+                onClick={() => handleShowMoreToggle('description', property?.details?.description || '')}
+                className="text-blue-500 underline mt-2"
+              >
+                Show More
+              </button>
                     )}
 
                     {/* Divider */}
@@ -168,7 +168,7 @@ const PropertyDetail = () => {
                                 ))
                             }
                         </ul>
-                        {property.details.features.length > maxItemsToShow.features && (
+                        {property?.details?.features.length > maxItemsToShow.features && (
                             <button
                                 onClick={() => handleShowMoreToggle('features')}
                                 className="text-blue-500 underline mt-2"
@@ -192,7 +192,7 @@ const PropertyDetail = () => {
                                 ))
                             }
                         </ul>
-                        {Object.keys(property.details.houseRules).length > maxItemsToShow.houseRules && (
+                        {Object.keys(property?.details?.houseRules || {}).length > maxItemsToShow.houseRules && (
                             <button
                                 onClick={() => handleShowMoreToggle('houseRules')}
                                 className="text-blue-500 underline mt-2"
@@ -205,21 +205,27 @@ const PropertyDetail = () => {
                     {/* Divider */}
                     <hr className="block md:hidden my-4 border-t border-divider" />
 
-             {/* Reviews Section */}
-             <div className="mt-6">
+{/* Reviews Section */}
+<div className="mt-6">
   <h2 className="text-lg font-bold">Reviews</h2>
-  <ul className="space-y-4 mt-2">
-    {property.details.reviews.map((review, index) => (
-      <li key={index}>
-        <ReviewCard
-          name={review.name}
-          review={review.review}
-          date={review.date}
-          ranking={review.ranking}
-        />
-      </li>
-    ))}
-  </ul>
+  <div className="embla review-slider" ref={emblaRef}>
+    <div className="embla__container">
+      {property.details.reviews.map((review, index) => (
+        <div className="embla__slide" key={index}>
+          <ReviewCard
+            name={review.name}
+            review={review.review}
+            date={review.date}
+            ranking={review.ranking}
+            onShowMore={(fullReview) => {
+                setModalContent(fullReview); // Set the content
+                setIsShowMoreModalOpen(true); // Open the modal
+              }}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
 </div>
                 </div>
 
@@ -243,32 +249,48 @@ const PropertyDetail = () => {
         {isSmallScreen && (
             <CustomModal isOpen={true} onClose={() => router.back()}>
                 {content}
-                {/* Show More Modal within CustomModal */}
+
+                {/* Show More Modal inside CustomModal */}
                 {isShowMoreModalOpen && (
                     <ShowMoreModal
                         isOpen={isShowMoreModalOpen}
                         onClose={() => setIsShowMoreModalOpen(false)}
                     >
-                        {modalContent}
+                        <div className="p-4 text-gray-700">
+                            {modalContent} {/* Show full review content */}
+                        </div>
+                        <button
+                            className="mt-4 text-blue-500 underline"
+                            onClick={() => setIsShowMoreModalOpen(false)} // Close the modal
+                        >
+                            Close
+                        </button>
                     </ShowMoreModal>
                 )}
             </CustomModal>
         )}
 
-        {/* Main content for larger screens */}
         {!isSmallScreen && content}
 
-        {/* Show More Modal - for larger screens only */}
+        {/* Show More Modal for larger screens */}
         {!isSmallScreen && isShowMoreModalOpen && (
             <ShowMoreModal
                 isOpen={isShowMoreModalOpen}
                 onClose={() => setIsShowMoreModalOpen(false)}
             >
-                {modalContent}
+                <div className="p-4 text-gray-700">
+                    {modalContent} {/* Show full review content */}
+                </div>
+                <button
+                    className="mt-4 text-blue-500 underline"
+                    onClick={() => setIsShowMoreModalOpen(false)} // Close the modal
+                >
+                    Close
+                </button>
             </ShowMoreModal>
         )}
     </>
-    );
+);
 };
 
 export default PropertyDetail;

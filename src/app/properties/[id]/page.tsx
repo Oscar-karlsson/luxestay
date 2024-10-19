@@ -9,6 +9,7 @@ import BookingBarSmall from '@/components/BookingBarSmall';
 import BookingBoxLarge from '@/components/BookingBoxLarge';
 import CustomModal from '@/components/CustomModal';
 import ShowMoreModal from '@/components/ShowMoreModal';
+import ReviewCard from '@/components/ReviewCard';
 
 type ShowMoreSection = 'description' | 'features' | 'houseRules';
 
@@ -74,18 +75,21 @@ const PropertyDetail = () => {
         const handleResize = () => {
             setIsSmallScreen(window.innerWidth < 768);
         };
-
-        handleResize();  // Run the check when the component mounts
+    
+        handleResize();  
         window.addEventListener('resize', handleResize);
+    
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []); 
 
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
+    
     const content = (
         <div className="md:max-w-5xl md:mx-auto pb-16">
             {/* Title for larger screens */}
             <div className="hidden md:block text-2xl font-bold mb-4 md:mt-4">
-                {property.title}
+            {property?.title}
             </div>
 
             {/* Property Image Section */}
@@ -96,8 +100,8 @@ const PropertyDetail = () => {
                     <IoIosArrowBack className="text-2xl" />
                 </button>
                 <img
-                    src={property.images[0]}
-                    alt={property.title}
+                   src={property?.images?.[0]}
+                   alt={property?.title} 
                     className="w-full h-auto object-cover"
                 />
                 <div className="absolute top-4 right-4">
@@ -119,7 +123,7 @@ const PropertyDetail = () => {
                         </div>
                     </div>
 
-                    <p className="text-gray-700 mt-2">{property.details.description}</p>
+                    <p className="text-gray-700 mt-2">{property?.details?.description}</p>
                     {/* Show More button for description */}
                     {property.details.description.length > maxItemsToShow.description && (
                         <button
@@ -201,18 +205,22 @@ const PropertyDetail = () => {
                     {/* Divider */}
                     <hr className="block md:hidden my-4 border-t border-divider" />
 
-                    {/* Reviews */}
-                    <div className="mt-6">
-                        <h2 className="text-lg font-bold">Reviews</h2>
-                        <ul className="space-y-4 mt-2">
-                            {property.details.reviews.map((review, index) => (
-                                <li key={index} className="bg-gray-100 p-4 rounded">
-                                    <p className="font-bold">{review.name}</p>
-                                    <p className="text-gray-600 mt-1">{review.review}</p>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+             {/* Reviews Section */}
+             <div className="mt-6">
+  <h2 className="text-lg font-bold">Reviews</h2>
+  <ul className="space-y-4 mt-2">
+    {property.details.reviews.map((review, index) => (
+      <li key={index}>
+        <ReviewCard
+          name={review.name}
+          review={review.review}
+          date={review.date}
+          ranking={review.ranking}
+        />
+      </li>
+    ))}
+  </ul>
+</div>
                 </div>
 
                 {/* Booking Box for Large Screens */}

@@ -6,33 +6,31 @@
     "pricePerNight": 9700,
     "rating": 5.0,
     "images": [
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/3796f37b-1957-4df7-881e-7c3e10b52794.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/2880d61b-59d1-46f0-a3b7-a9a75879471e.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/c8c2e6b0-d08b-4011-8d6b-baac513d23d6.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/106aefc2-ac87-4e0c-9d38-b61711fdc1af.jpeg?im_w=1200"
+      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/3796f37b-1957-4df7-881e-7c3e10b52794.jpeg?im_w=1200"
     ],
     "isFavorite": true,
     "details": {
       "hostedBy": "John Doe",
       "description": "This luxurious villa offers stunning views, a private tennis court, and spacious rooms perfect for families or groups.",
       "address": "123 Marbella St, Spain",
-      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
       "features": ["Wi-Fi", "Private Pool", "Tennis Court", "Parking", "Pets Allowed"],
       "houseRules": {
         "checkIn": "2:00 PM",
         "checkOut": "11:00 AM",
         "security": "Security cameras on property"
       },
-      "safetyFeatures": ["Fire extinguisher", "Smoke alarm"],
-      "services": ["Private chef", "In-house spa", "Daily housekeeping"],
       "reviews": [
         {
           "name": "Alice Smith",
-          "review": "This villa is incredible! The amenities and location were perfect for our family vacation."
+          "review": "This villa is incredible! The amenities and location were perfect for our family vacation.",
+          "date": "2024-10-01",
+          "ranking": 5
         },
         {
           "name": "Mark Johnson",
-          "review": "Amazing villa, the tennis court was a great addition and the service was top-notch."
+          "review": "Amazing villa, the tennis court was a great addition and the service was top-notch.",
+          "date": "2024-09-21",
+          "ranking": 4.8
         }
       ]
     }
@@ -44,185 +42,319 @@
     "pricePerNight": 8500,
     "rating": 4.9,
     "images": [
-      "https://a0.muscache.com/im/pictures/miso/Hosting-1236685254994899220/original/5b793d25-86d7-4e97-ac07-b30b90f223d2.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/3c676cbf-55fb-4a36-86c3-bb2ecab0209d.jpeg?im_w=720",
-      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/4572638d-05b7-4d69-9ddb-5d48875e79b3.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/0ec83020-7882-4a6c-9962-e589978af359.jpeg?im_w=1200"
+      "https://a0.muscache.com/im/pictures/miso/Hosting-1236685254994899220/original/5b793d25-86d7-4e97-ac07-b30b90f223d2.jpeg?im_w=1200"
     ],
     "isFavorite": false,
     "details": {
       "hostedBy": "Jane Smith",
       "description": "Villa Ocean Pearl is a modern beachfront property offering stunning views of the Mediterranean Sea.",
       "address": "456 Ibiza Beach Rd, Spain",
-      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
       "features": ["Wi-Fi", "Hot tub", "Beach access", "Private Pool"],
       "houseRules": {
         "checkIn": "3:00 PM",
         "checkOut": "12:00 PM",
         "security": "No security cameras"
       },
-      "safetyFeatures": ["Smoke alarm", "Carbon monoxide detector"],
-      "services": ["Daily housekeeping", "Private chef"],
       "reviews": [
         {
           "name": "Chris Lee",
-          "review": "The perfect getaway. The views are breathtaking and the villa is very private."
+          "review": "The perfect getaway. The views are breathtaking and the villa is very private.",
+          "date": "2024-09-10",
+          "ranking": 4.9
         },
         {
           "name": "Sara Wilson",
-          "review": "Absolutely loved the villa, especially the beachfront access and the hot tub."
+          "review": "Absolutely loved the villa, especially the beachfront access and the hot tub.",
+          "date": "2024-08-25",
+          "ranking": 4.7
         }
       ]
     }
   },
   {
     "id": 3,
-    "title": "Buccara Villa El Nido",
-    "location": "Marbella, Spain",
-    "pricePerNight": 9700,
+    "title": "Hacienda De La Paz",
+    "location": "Malaga, Spain",
+    "pricePerNight": 12000,
     "rating": 5.0,
     "images": [
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/3796f37b-1957-4df7-881e-7c3e10b52794.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/2880d61b-59d1-46f0-a3b7-a9a75879471e.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/c8c2e6b0-d08b-4011-8d6b-baac513d23d6.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/106aefc2-ac87-4e0c-9d38-b61711fdc1af.jpeg?im_w=1200"
+      "https://a0.muscache.com/im/pictures/123.jpg"
     ],
     "isFavorite": true,
     "details": {
-      "hostedBy": "John Doe",
-      "description": "This luxurious villa offers stunning views, a private tennis court, and spacious rooms perfect for families or groups.",
-      "address": "123 Marbella St, Spain",
-      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
-      "features": ["Wi-Fi", "Private Pool", "Tennis Court", "Parking", "Pets Allowed"],
+      "hostedBy": "Carlos Santana",
+      "description": "A stunning hilltop villa with panoramic views of the coast. Features a full spa, infinity pool, and beautiful gardens.",
+      "address": "789 Mountain Rd, Spain",
+      "features": ["Infinity Pool", "Spa", "Private Garden", "Home Theater", "Gym"],
       "houseRules": {
-        "checkIn": "2:00 PM",
+        "checkIn": "4:00 PM",
         "checkOut": "11:00 AM",
-        "security": "Security cameras on property"
+        "security": "On-site security staff"
       },
-      "safetyFeatures": ["Fire extinguisher", "Smoke alarm"],
-      "services": ["Private chef", "In-house spa", "Daily housekeeping"],
       "reviews": [
         {
-          "name": "Alice Smith",
-          "review": "This villa is incredible! The amenities and location were perfect for our family vacation."
+          "name": "Sophia Martinez",
+          "review": "Incredible experience! The villa was breathtaking and the amenities were beyond luxurious.",
+          "date": "2024-07-15",
+          "ranking": 5
         },
         {
-          "name": "Mark Johnson",
-          "review": "Amazing villa, the tennis court was a great addition and the service was top-notch."
+          "name": "Ethan Brown",
+          "review": "The perfect retreat for relaxation and fun. The private spa was a highlight!",
+          "date": "2024-06-30",
+          "ranking": 5
         }
       ]
     }
   },
   {
     "id": 4,
-    "title": "Villa Ocean Pearl",
-    "location": "Ibiza, Spain",
-    "pricePerNight": 8500,
-    "rating": 4.9,
+    "title": "Casa Blanca",
+    "location": "Tulum, Mexico",
+    "pricePerNight": 9500,
+    "rating": 4.8,
     "images": [
-      "https://a0.muscache.com/im/pictures/miso/Hosting-1236685254994899220/original/5b793d25-86d7-4e97-ac07-b30b90f223d2.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/3c676cbf-55fb-4a36-86c3-bb2ecab0209d.jpeg?im_w=720",
-      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/4572638d-05b7-4d69-9ddb-5d48875e79b3.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/0ec83020-7882-4a6c-9962-e589978af359.jpeg?im_w=1200"
+      "https://a0.muscache.com/im/pictures/456.jpg"
     ],
-    "isFavorite": false,
+    "isFavorite": true,
     "details": {
-      "hostedBy": "Jane Smith",
-      "description": "Villa Ocean Pearl is a modern beachfront property offering stunning views of the Mediterranean Sea.",
-      "address": "456 Ibiza Beach Rd, Spain",
-      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
-      "features": ["Wi-Fi", "Hot tub", "Beach access", "Private Pool"],
+      "hostedBy": "Mia Gomez",
+      "description": "A beachfront villa in the heart of Tulum. Relax in the private pool or enjoy the outdoor kitchen and BBQ area.",
+      "address": "123 Beach Rd, Tulum, Mexico",
+      "features": ["Beachfront", "Outdoor Kitchen", "BBQ", "Private Pool", "Wi-Fi"],
       "houseRules": {
         "checkIn": "3:00 PM",
-        "checkOut": "12:00 PM",
-        "security": "No security cameras"
+        "checkOut": "11:00 AM",
+        "security": "Security guard on premises"
       },
-      "safetyFeatures": ["Smoke alarm", "Carbon monoxide detector"],
-      "services": ["Daily housekeeping", "Private chef"],
       "reviews": [
         {
-          "name": "Chris Lee",
-          "review": "The perfect getaway. The views are breathtaking and the villa is very private."
+          "name": "Oliver Davis",
+          "review": "The outdoor area was perfect for our group. Great place to relax and have fun.",
+          "date": "2024-08-05",
+          "ranking": 4.9
         },
         {
-          "name": "Sara Wilson",
-          "review": "Absolutely loved the villa, especially the beachfront access and the hot tub."
+          "name": "Isabella King",
+          "review": "Beautiful villa with everything you need for a great vacation.",
+          "date": "2024-07-25",
+          "ranking": 4.7
         }
       ]
     }
   },
   {
     "id": 5,
-    "title": "Buccara Villa El Nido",
-    "location": "Marbella, Spain",
-    "pricePerNight": 9700,
+    "title": "Villa Paradiso",
+    "location": "Capri, Italy",
+    "pricePerNight": 15000,
     "rating": 5.0,
     "images": [
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/3796f37b-1957-4df7-881e-7c3e10b52794.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/2880d61b-59d1-46f0-a3b7-a9a75879471e.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/c8c2e6b0-d08b-4011-8d6b-baac513d23d6.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/106aefc2-ac87-4e0c-9d38-b61711fdc1af.jpeg?im_w=1200"
+      "https://a0.muscache.com/im/pictures/789.jpg"
     ],
-    "isFavorite": true,
+    "isFavorite": false,
     "details": {
-      "hostedBy": "John Doe",
-      "description": "This luxurious villa offers stunning views, a private tennis court, and spacious rooms perfect for families or groups.",
-      "address": "123 Marbella St, Spain",
-      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
-      "features": ["Wi-Fi", "Private Pool", "Tennis Court", "Parking", "Pets Allowed"],
+      "hostedBy": "Antonio Rossi",
+      "description": "A luxurious cliffside villa with spectacular ocean views. The perfect place for a peaceful retreat.",
+      "address": "456 Ocean View Rd, Capri, Italy",
+      "features": ["Ocean View", "Private Chef", "Hot Tub", "Wi-Fi", "Outdoor Dining"],
       "houseRules": {
-        "checkIn": "2:00 PM",
-        "checkOut": "11:00 AM",
-        "security": "Security cameras on property"
+        "checkIn": "4:00 PM",
+        "checkOut": "12:00 PM",
+        "security": "Gated community"
       },
-      "safetyFeatures": ["Fire extinguisher", "Smoke alarm"],
-      "services": ["Private chef", "In-house spa", "Daily housekeeping"],
       "reviews": [
         {
-          "name": "Alice Smith",
-          "review": "This villa is incredible! The amenities and location were perfect for our family vacation."
+          "name": "Liam Harris",
+          "review": "The view from this villa is unreal! It was the most peaceful and beautiful vacation we've ever had.",
+          "date": "2024-09-01",
+          "ranking": 5
         },
         {
-          "name": "Mark Johnson",
-          "review": "Amazing villa, the tennis court was a great addition and the service was top-notch."
+          "name": "Emily Wright",
+          "review": "Everything was perfect. The private chef was a fantastic touch!",
+          "date": "2024-08-15",
+          "ranking": 4.9
         }
       ]
     }
   },
   {
     "id": 6,
-    "title": "Villa Ocean Pearl",
-    "location": "Ibiza, Spain",
-    "pricePerNight": 8500,
+    "title": "Sunset Ridge",
+    "location": "Santorini, Greece",
+    "pricePerNight": 11000,
+    "rating": 5.0,
+    "images": [
+      "https://a0.muscache.com/im/pictures/1011.jpg"
+    ],
+    "isFavorite": true,
+    "details": {
+      "hostedBy": "Nico Papadopoulos",
+      "description": "A stunning villa perched on a ridge with unparalleled sunset views. Complete with a wine cellar and infinity pool.",
+      "address": "123 Sunset Blvd, Santorini, Greece",
+      "features": ["Infinity Pool", "Wine Cellar", "Sunset Views", "Wi-Fi", "Private Chef"],
+      "houseRules": {
+        "checkIn": "3:00 PM",
+        "checkOut": "11:00 AM",
+        "security": "On-site guard"
+      },
+      "reviews": [
+        {
+          "name": "Olivia Wilson",
+          "review": "The sunsets here are something out of a dream. This villa is absolute paradise!",
+          "date": "2024-08-11",
+          "ranking": 5
+        },
+        {
+          "name": "Noah Evans",
+          "review": "A fantastic experience. The wine cellar and chef made our stay extra special.",
+          "date": "2024-07-30",
+          "ranking": 4.9
+        }
+      ]
+    }
+  },
+  {
+    "id": 7,
+    "title": "Palazzo dei Fiori",
+    "location": "Lake Como, Italy",
+    "pricePerNight": 13000,
     "rating": 4.9,
     "images": [
-      "https://a0.muscache.com/im/pictures/miso/Hosting-1236685254994899220/original/5b793d25-86d7-4e97-ac07-b30b90f223d2.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/3c676cbf-55fb-4a36-86c3-bb2ecab0209d.jpeg?im_w=720",
-      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/4572638d-05b7-4d69-9ddb-5d48875e79b3.jpeg?im_w=1200",
-      "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTIzNjY4NTI1NDk5NDg5OTIyMA%3D%3D/original/0ec83020-7882-4a6c-9962-e589978af359.jpeg?im_w=1200"
+      "https://a0.muscache.com/im/pictures/1234.jpg"
+    ],
+    "isFavorite": true,
+    "details": {
+      "hostedBy": "Giovanni Ricci",
+      "description": "A historic villa with modern amenities, offering beautiful lake views and a private dock for boat access.",
+      "address": "456 Lake Rd, Lake Como, Italy",
+      "features": ["Lake View", "Boat Dock", "Private Pool", "Wi-Fi", "Fireplace"],
+      "houseRules": {
+        "checkIn": "4:00 PM",
+        "checkOut": "12:00 PM",
+        "security": "Private security"
+      },
+      "reviews": [
+        {
+          "name": "Sophia Johnson",
+          "review": "Staying here felt like living in a fairytale. The lake views were spectacular!",
+          "date": "2024-09-10",
+          "ranking": 5
+        },
+        {
+          "name": "Jackson White",
+          "review": "An unforgettable experience. The villa is a perfect blend of historic charm and modern luxury.",
+          "date": "2024-08-28",
+          "ranking": 4.9
+        }
+      ]
+    }
+  },
+  {
+    "id": 8,
+    "title": "The Glass House",
+    "location": "Palm Springs, USA",
+    "pricePerNight": 10000,
+    "rating": 5.0,
+    "images": [
+      "https://a0.muscache.com/im/pictures/1357.jpg"
     ],
     "isFavorite": false,
     "details": {
-      "hostedBy": "Jane Smith",
-      "description": "Villa Ocean Pearl is a modern beachfront property offering stunning views of the Mediterranean Sea.",
-      "address": "456 Ibiza Beach Rd, Spain",
-      "mapUrl": "https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/w_2560%2Cc_limit/GoogleMapTA.jpg",
-      "features": ["Wi-Fi", "Hot tub", "Beach access", "Private Pool"],
+      "hostedBy": "Michael King",
+      "description": "A modern architectural masterpiece featuring floor-to-ceiling glass walls with stunning desert views.",
+      "address": "789 Desert St, Palm Springs, USA",
+      "features": ["Desert Views", "Private Pool", "Outdoor Fire Pit", "Wi-Fi", "Hot Tub"],
+      "houseRules": {
+        "checkIn": "3:00 PM",
+        "checkOut": "11:00 AM",
+        "security": "Gated property"
+      },
+      "reviews": [
+        {
+          "name": "Mason Green",
+          "review": "The design of this house is out of this world. The views at night were unbeatable!",
+          "date": "2024-07-20",
+          "ranking": 5
+        },
+        {
+          "name": "Ella Scott",
+          "review": "We had an amazing time. The hot tub and fire pit were perfect for relaxing under the stars.",
+          "date": "2024-06-30",
+          "ranking": 4.9
+        }
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "title": "The Treehouse",
+    "location": "Costa Rica",
+    "pricePerNight": 9000,
+    "rating": 4.8,
+    "images": [
+      "https://a0.muscache.com/im/pictures/1657.jpg"
+    ],
+    "isFavorite": true,
+    "details": {
+      "hostedBy": "Julia Mendoza",
+      "description": "A luxury villa built in the trees with spectacular jungle views and an eco-friendly design.",
+      "address": "123 Jungle Rd, Costa Rica",
+      "features": ["Jungle Views", "Eco-friendly", "Private Pool", "Wi-Fi", "Outdoor Shower"],
+      "houseRules": {
+        "checkIn": "2:00 PM",
+        "checkOut": "11:00 AM",
+        "security": "Eco-friendly"
+      },
+      "reviews": [
+        {
+          "name": "Lily Turner",
+          "review": "The villa's design in the trees was so unique. We felt like we were one with nature.",
+          "date": "2024-08-15",
+          "ranking": 4.8
+        },
+        {
+          "name": "James Morgan",
+          "review": "A truly amazing experience! Perfect for eco-conscious travelers.",
+          "date": "2024-07-25",
+          "ranking": 4.7
+        }
+      ]
+    }
+  },
+  {
+    "id": 10,
+    "title": "Casa Azul",
+    "location": "Cabo San Lucas, Mexico",
+    "pricePerNight": 10500,
+    "rating": 5.0,
+    "images": [
+      "https://a0.muscache.com/im/pictures/1789.jpg"
+    ],
+    "isFavorite": false,
+    "details": {
+      "hostedBy": "Diego Torres",
+      "description": "A beachfront villa with modern Mexican decor, perfect for enjoying the sun and surf.",
+      "address": "789 Beach Rd, Cabo San Lucas, Mexico",
+      "features": ["Beachfront", "Private Pool", "Wi-Fi", "Outdoor Kitchen", "Hot Tub"],
       "houseRules": {
         "checkIn": "3:00 PM",
         "checkOut": "12:00 PM",
-        "security": "No security cameras"
+        "security": "Security staff"
       },
-      "safetyFeatures": ["Smoke alarm", "Carbon monoxide detector"],
-      "services": ["Daily housekeeping", "Private chef"],
       "reviews": [
         {
-          "name": "Chris Lee",
-          "review": "The perfect getaway. The views are breathtaking and the villa is very private."
+          "name": "Lucas Gray",
+          "review": "Casa Azul was everything we hoped for. The beach was right at our doorstep!",
+          "date": "2024-08-05",
+          "ranking": 5
         },
         {
-          "name": "Sara Wilson",
-          "review": "Absolutely loved the villa, especially the beachfront access and the hot tub."
+          "name": "Mia Peterson",
+          "review": "Loved every minute of our stay. The outdoor kitchen and hot tub were fantastic!",
+          "date": "2024-07-18",
+          "ranking": 4.9
         }
       ]
     }

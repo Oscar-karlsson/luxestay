@@ -234,9 +234,9 @@ const PropertyDetail = () => {
                 </div>
 
                 {/* Booking Box for Large Screens */}
-                <div className="hidden md:block md:sticky md:top-20">
-                    <BookingBoxLarge pricePerNight={property.pricePerNight} />
-                </div>
+                <div className="hidden md:block md:sticky md:top-4 md:h-[calc(100vh-30rem)]">
+    <BookingBoxLarge pricePerNight={property.pricePerNight} />
+</div>
             </div>
 
             {/* Booking Bar for Small Screens */}

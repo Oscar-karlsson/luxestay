@@ -12,7 +12,7 @@ interface ReviewCardProps {
   }
   
   const ReviewCard: React.FC<ReviewCardProps> = ({ name, review, date, ranking, onShowMore }) => {
-    const maxLength = 10; // Maximum number of characters before truncating
+    const maxLength = 100; // Maximum number of characters before truncating
   
     // Show truncated review if it's longer than maxLength
     const truncatedReview = review.length > maxLength ? `${review.substring(0, maxLength)}...` : review;

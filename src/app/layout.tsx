@@ -11,6 +11,7 @@ import "./globals.css";
 import './modalStyles.css'
 import BottomNavbar from "@/components/BottomNavbar";
 import TopNavbar from "@/components/TopNavbar";
+import Footer from "@/components/Footer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -36,10 +37,11 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className="bg-primary antialiased">
-          <TopNavbar /> {/* Include the Top Navbar here */}
-          {children}
-          <BottomNavbar /> {/* Include the Bottom Navbar here */}
+        <body className="bg-primary antialiased flex flex-col min-h-screen">
+          <TopNavbar /> {/* Include the Top Navbar */}
+          <main className="flex-grow">{children}</main> {/* Main content area grows */}
+          <Footer /> {/* Footer component here */}
+          <BottomNavbar /> {/* Bottom Navbar */}
         </body>
       </html>
     </ClerkProvider>

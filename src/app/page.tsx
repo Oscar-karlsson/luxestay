@@ -5,7 +5,7 @@ import SearchBar from '@/components/SearchBar';
 
 const Explore = () => {
   return (
-    <div className="p-4 pb-24">
+    <div className="p-4 ">
    
 
  {/* Search Bar */}

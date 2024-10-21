@@ -1,6 +1,7 @@
 import React from 'react';
 import { AiFillStar } from 'react-icons/ai';
 import FavoriteStar from '@/components/FavoriteStar';
+import Link from 'next/link';
 
 interface Property {
   id: number;
@@ -19,6 +20,7 @@ interface FavoriteCardProps {
 
 const FavoriteCard: React.FC<FavoriteCardProps> = ({ property }) => {
     return (
+        <Link href={`/properties/${property.id}`} passHref>
         <div className="flex flex-row lg:flex-col bg-white rounded-lg shadow-md w-full relative">
         
           {/* Image Section */}
@@ -82,6 +84,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ property }) => {
             </div>
           </div>
         </div>
+        </Link>
       );
     };
 

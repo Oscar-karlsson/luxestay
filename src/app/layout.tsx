@@ -39,11 +39,9 @@ export default function RootLayout({
       <html lang="en">
         <body className="bg-primary antialiased flex flex-col min-h-screen">
           <TopNavbar /> 
-          <main className="flex-grow">{children}</main> 
+          <main className="flex-grow pb-20 md:pb-0">{children}</main>
           <Footer /> 
-          <div className="pt-20">
   <BottomNavbar />
-</div>
         </body>
       </html>
     </ClerkProvider>

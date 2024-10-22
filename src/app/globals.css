@@ -163,3 +163,16 @@ h1, h2, h3, h4, h5 {
   flex: 0 0 100%; /* Ensures each slide occupies the full width */
   padding: 10px; /* Optional: add spacing around the slides */
 }
+
+
+
+@media (min-width: 1024px) {
+  .clerk-modal {
+    position: fixed !important;
+    right: 0 !important;
+    left: auto !important; /* Override left to auto so it doesn't stay on the left */
+    transform: translateX(0) !important; /* Reset any translations */
+    max-width: 400px; /* Adjust the width as needed */
+    top: 10%; /* Adjust the top position if needed */
+  }
+}

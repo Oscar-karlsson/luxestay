@@ -1,7 +1,8 @@
 import { useUser, UserButton, UserProfile } from '@clerk/nextjs';
-import { FaUser, FaCreditCard, FaFileContract, FaLock } from 'react-icons/fa'; // Importing icons
+import { FaUser, FaCreditCard, FaFileContract, FaLock, FaPlus } from 'react-icons/fa'; // Importing icons
 import { FiLogOut } from 'react-icons/fi'; // Importing logout icon
 import { useState } from 'react';
+import Link from 'next/link';
 
 const Profile = () => {
   const { user } = useUser(); // Get the user's info from Clerk
@@ -47,6 +48,15 @@ const Profile = () => {
               </span>
               <span>&gt;</span>
             </li>
+
+            <li className="flex items-center justify-between py-2 border-b">
+            <Link href="/add-property" className="flex items-center">
+              <FaPlus className="mr-2" /> 
+              Add Property
+            </Link>
+            <span>&gt;</span>
+          </li>
+
           </ul>
         </div>
 

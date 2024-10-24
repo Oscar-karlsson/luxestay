@@ -18,9 +18,7 @@ const AddPropertyPage = () => {
     checkOutTime: '',
     address: '',
     city: '',
-    state: '',
     country: '',
-    postalCode: '',
     features: [] as string[],
     houseRules: [] as string[],
     services: [] as string[],
@@ -28,23 +26,38 @@ const AddPropertyPage = () => {
   });
   const [previewImages, setPreviewImages] = useState<string[]>([]); // Store image previews
   const [dragging, setDragging] = useState(false); // State for drag-and-drop
+  const [loading, setLoading] = useState(false); // Add loading state
+
+
+
+const INPUT_MIN = 10;
+const INPUT_MAX = 100000;
+const INPUT_STEP = 1;
+
+const SLIDER_MIN = 10;
+const SLIDER_MAX = 100000;
+const SLIDER_STEP = 10;
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  
+    if (loading) return; // Prevent double submission
+  
+    setLoading(true); // Set loading to true when form submission starts
+  
     try {
-      // Ensure you're using the imported `storage` from Firebase setup
       const imageUrls: string[] = [];
     
-      // Upload each image to Firebase Storage
       for (const image of formData.images) {
         const storageRef = ref(storage, `properties/${Date.now()}-${image.name}`);
         await uploadBytes(storageRef, image);
         const downloadURL = await getDownloadURL(storageRef);
-        imageUrls.push(downloadURL); // Push the URL to the array
+        imageUrls.push(downloadURL);
       }
+
+
   
-      // Prepare form data including image URLs
       const formDataToSend = new FormData();
       formDataToSend.append('title', formData.title);
       formDataToSend.append('description', formData.description);
@@ -55,19 +68,13 @@ const AddPropertyPage = () => {
       formDataToSend.append('checkOutTime', formData.checkOutTime);
       formDataToSend.append('address', formData.address);
       formDataToSend.append('city', formData.city);
-      formDataToSend.append('state', formData.state);
       formDataToSend.append('country', formData.country);
-      formDataToSend.append('postalCode', formData.postalCode);
   
-      // Append arrays
       formData.features.forEach((feature) => formDataToSend.append('features[]', feature));
       formData.houseRules.forEach((rule) => formDataToSend.append('houseRules[]', rule));
       formData.services.forEach((service) => formDataToSend.append('services[]', service));
-  
-      // Append image URLs
       imageUrls.forEach((url) => formDataToSend.append('imageUrls[]', url));
   
-      // Send the form data to the backend
       const response = await fetch('/api/properties', {
         method: 'POST',
         body: formDataToSend,
@@ -78,6 +85,8 @@ const AddPropertyPage = () => {
       }
     } catch (error) {
       console.error('Error adding property:', error);
+    } finally {
+      setLoading(false); // Set loading to false after submission is done
     }
   };
 
@@ -165,48 +174,90 @@ const AddPropertyPage = () => {
 
         {/* Price Input */}
         <div className="mb-4">
-          <label className="block mb-2">Price per Night</label>
-          <div className="flex items-center space-x-4">
-            {/* Minus button */}
-            <button
-              type="button"
-              className="px-3 py-1 bg-gray-200 rounded"
-              onClick={() => setFormData({ ...formData, price: Math.max(0, formData.price - 10) })}
-            >
-              -
-            </button>
+  <label className="block mb-2">Price per Night</label>
+  <div className="flex items-center space-x-4">
+    {/* Minus button */}
+    <button
+      type="button"
+      className="px-3 py-1 bg-gray-200 rounded"
+      onClick={() => setFormData({ ...formData, price: Math.max(SLIDER_MIN, formData.price - SLIDER_STEP) })}
+    >
+      -
+    </button>
 
-            {/* Slider */}
-            <input
-              type="range"
-              name="price"
-              min="0"
-              max="100000"
-              step="10"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-              className="w-full"
-            />
+    {/* Slider */}
+    <input
+      type="range"
+      name="price"
+      min={SLIDER_MIN}
+      max={SLIDER_MAX}
+      step={SLIDER_STEP}
+      value={formData.price}
+      onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+      className="w-full"
+    />
 
-            {/* Plus button */}
-            <button
-              type="button"
-              className="px-3 py-1 bg-gray-200 rounded"
-              onClick={() => setFormData({ ...formData, price: Math.min(1000, formData.price + 10) })}
-            >
-              +
-            </button>
-          </div>
+    {/* Plus button */}
+    <button
+      type="button"
+      className="px-3 py-1 bg-gray-200 rounded"
+      onClick={() => setFormData({ ...formData, price: Math.min(SLIDER_MAX, formData.price + SLIDER_STEP) })}
+    >
+      +
+    </button>
+  </div>
 
           {/* Display the price */}
-          <div className="text-right mt-2">Price: €{formData.price}</div>
+          <div className="flex items-center justify-end mt-2 relative group">
+    <span className="mr-2">Price: €</span>
+    <div className="relative w-24">
+      {/* Minus button */}
+      <button
+        type="button"
+        className="absolute left-0 top-1/2 transform -translate-y-1/2 px-2 py-1 text-gray-500 hover:text-black opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={() => setFormData((prev) => ({ ...prev, price: Math.max(prev.price - INPUT_STEP, INPUT_MIN) }))}
+      >
+        -
+      </button>
+
+      {/* Price input */}
+      <input
+        type="number"
+        name="price"
+        min={INPUT_MIN}
+        max={INPUT_MAX}
+        step={INPUT_STEP}
+        className="border w-full p-1 text-center appearance-none custom-number-input"
+        value={formData.price === 0 ? '' : formData.price} // Allow clearing the input
+        onChange={(e) => {
+          const value = e.target.value === '' ? 0 : Number(e.target.value);
+          setFormData((prev) => ({ ...prev, price: value }));
+        }}
+        onBlur={() => {
+          if (formData.price < INPUT_MIN) {
+            setFormData((prev) => ({ ...prev, price: INPUT_MIN })); // Set minimum value on blur
+          }
+        }}
+        required
+      />
+
+      {/* Plus button */}
+      <button
+        type="button"
+        className="absolute right-0 top-1/2 transform -translate-y-1/2 px-2 py-1 text-gray-500 hover:text-black opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={() => setFormData((prev) => ({ ...prev, price: Math.min(prev.price + INPUT_STEP, INPUT_MAX) }))}
+      >
+        +
+      </button>
+    </div>
+  </div>
         </div>
 
 
 
 
 
-   {/* Address, City, State, Country, Postal Code */}
+   {/* Address, City, State, Country */}
    <p className="text-lg font-semibold text-center mb-4">Enter Property Address</p>
         <div className="mb-4">
           <label className="block mb-2">Address</label>
@@ -242,16 +293,7 @@ const AddPropertyPage = () => {
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block mb-2">Postal Code</label>
-          <input
-            type="text"
-            name="postalCode"
-            className="border p-2 w-full"
-            value={formData.postalCode}
-            onChange={handleInputChange}
-          />
-        </div>
+
 
 
         {/* Coordinates Input */}
@@ -378,6 +420,7 @@ const AddPropertyPage = () => {
               className="hidden"
               multiple
               onChange={(e) => handleFileChange(e.target.files)}
+              required
             />
             <span className="underline">click to upload</span>
           </label>
@@ -396,9 +439,13 @@ const AddPropertyPage = () => {
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded">
-            Submit
-          </button>
+          <button
+  type="submit"
+  className={`bg-blue-500 text-white py-2 px-4 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+  disabled={loading} // Disable button while loading
+>
+  {loading ? 'Submitting...' : 'Submit'}
+</button>
         </div>
       </form>
     </div>

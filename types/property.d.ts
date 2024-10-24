@@ -7,7 +7,6 @@ interface PropertyData {
   address: string;
   city: string;
   country: string;
-  postalCode: string;
   features: string[];
   houseRules: string[];
   services: string[];

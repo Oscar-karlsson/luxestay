@@ -4,10 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/utils/firebase';
+import { useAuth } from '@clerk/nextjs';
 import { featuresOptions, houseRulesOptions, servicesOptions } from '@/data/propertyOptions';
+import { collection, addDoc, updateDoc } from 'firebase/firestore'; 
+import { firestore } from '@/utils/firebase'; // Import firestore
 
 const AddPropertyPage = () => {
   const router = useRouter();
+  const { userId } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -48,41 +52,24 @@ const SLIDER_STEP = 10;
   
     try {
       const imageUrls: string[] = [];
-    
+  
+      // Create the Firestore document first to get its ID
+      const { images, ...restFormData } = formData; // Exclude the images field
+      const docRef = await addDoc(collection(firestore, 'properties'), { ...restFormData, userId, imageUrls: [] });
+      const propertyId = docRef.id; // Get the Firestore document ID
+  
+      // Upload images to the property-specific folder
       for (const image of formData.images) {
-        const storageRef = ref(storage, `properties/${Date.now()}-${image.name}`);
+        const storageRef = ref(storage, `properties/${propertyId}/${Date.now()}-${image.name}`);
         await uploadBytes(storageRef, image);
         const downloadURL = await getDownloadURL(storageRef);
         imageUrls.push(downloadURL);
       }
-
-
   
-      const formDataToSend = new FormData();
-      formDataToSend.append('title', formData.title);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('price', String(formData.price));
-      formDataToSend.append('latitude', formData.latitude);
-      formDataToSend.append('longitude', formData.longitude);
-      formDataToSend.append('checkInTime', formData.checkInTime);
-      formDataToSend.append('checkOutTime', formData.checkOutTime);
-      formDataToSend.append('address', formData.address);
-      formDataToSend.append('city', formData.city);
-      formDataToSend.append('country', formData.country);
+      // Update the Firestore document with image URLs
+      await updateDoc(docRef, { imageUrls });
   
-      formData.features.forEach((feature) => formDataToSend.append('features[]', feature));
-      formData.houseRules.forEach((rule) => formDataToSend.append('houseRules[]', rule));
-      formData.services.forEach((service) => formDataToSend.append('services[]', service));
-      imageUrls.forEach((url) => formDataToSend.append('imageUrls[]', url));
-  
-      const response = await fetch('/api/properties', {
-        method: 'POST',
-        body: formDataToSend,
-      });
-  
-      if (response.ok) {
-        router.push('/profile'); // Redirect after success
-      }
+      router.push('/profile'); // Redirect after success
     } catch (error) {
       console.error('Error adding property:', error);
     } finally {

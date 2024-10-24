@@ -56,7 +56,13 @@ const Profile = () => {
             </Link>
             <span>&gt;</span>
           </li>
-
+          <li className="flex items-center justify-between py-2 border-b">
+            <Link href="/my-properties" className="flex items-center">
+              <FaPlus className="mr-2" /> 
+              My Properties
+            </Link>
+            <span>&gt;</span>
+          </li>
           </ul>
         </div>
 

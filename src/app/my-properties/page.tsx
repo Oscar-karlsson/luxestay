@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getStorage, ref, deleteObject, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { firestore } from '@/utils/firebase';
 import { useAuth } from '@clerk/nextjs';
 import Modal from 'react-modal'; 
 import useEmblaCarousel from 'embla-carousel-react';
 import { featuresOptions, houseRulesOptions, servicesOptions } from '@/data/propertyOptions';
+import { FaRegTrashCan } from "react-icons/fa6";
 
 
 const MyPropertiesPage = () => {
@@ -24,19 +26,51 @@ const MyPropertiesPage = () => {
     }
   
     const fetchProperties = async () => {
-      if (userId) {
-        const q = query(collection(firestore, 'properties'), where('userId', '==', userId));
-        const querySnapshot = await getDocs(q);
-        const userProperties = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setProperties(userProperties);
-      }
-    };
-  
-    fetchProperties();
-  }, [userId]);
+        if (userId) {
+          const q = query(collection(firestore, 'properties'), where('userId', '==', userId));
+          const querySnapshot = await getDocs(q);
+    
+          const userProperties = await Promise.all(
+            querySnapshot.docs.map(async (doc) => {
+              const property = { id: doc.id, ...doc.data() };
+    
+              // Check each image URL in storage
+              const validImageUrls = await verifyImagesExist(property.imageUrls);
+              property.imageUrls = validImageUrls;
+    
+              // Update Firestore if any invalid URLs were removed
+              if (validImageUrls.length !== property.imageUrls.length) {
+                const propertyRef = doc(firestore, 'properties', property.id);
+                await updateDoc(propertyRef, { imageUrls: validImageUrls });
+              }
+    
+              return property;
+            })
+          );
+          setProperties(userProperties);
+        }
+      };
+    
+      fetchProperties();
+    }, [userId]);
+
+    const verifyImagesExist = async (imageUrls) => {
+        const storage = getStorage();
+        const validUrls = [];
+      
+        for (const url of imageUrls) {
+          const imageRef = ref(storage, url);
+          try {
+            await getDownloadURL(imageRef); // Only keeps URLs that exist
+            validUrls.push(url);
+          } catch (error) {
+            console.warn(`Image at ${url} does not exist and will be removed.`);
+          }
+        }
+      
+        return validUrls;
+      };
+      
 
   const handleEditClick = (property: any) => {
     setCurrentProperty(property);
@@ -84,6 +118,126 @@ const MyPropertiesPage = () => {
       };
     });
   };
+
+
+
+  const storage = getStorage(); // Initialize storage
+
+
+  const handleRemoveImage = async (index: number) => {
+    const imageUrl = currentProperty.imageUrls[index];
+    const imageRef = ref(storage, imageUrl);
+  
+    try {
+      // Remove image from Firebase Storage
+      await deleteObject(imageRef);
+  
+      // Update local state to remove the image URL
+      const updatedImages = currentProperty.imageUrls.filter((_: string, i: number) => i !== index);
+      setCurrentProperty((prev: typeof currentProperty) => ({ ...prev, imageUrls: updatedImages }));
+  
+      // Update Firestore with the new list of image URLs
+      const propertyRef = doc(firestore, 'properties', currentProperty.id);
+      await updateDoc(propertyRef, { imageUrls: updatedImages });
+  
+      // Update the `properties` state directly to reflect the change on the main list
+      setProperties((prevProperties: typeof properties) =>
+        prevProperties.map((property) =>
+          property.id === currentProperty.id
+            ? { ...property, imageUrls: updatedImages }
+            : property
+        )
+      );
+  
+      // Adjust selected image index to ensure valid index is selected
+      setSelectedImageIndex((prevIndex) =>
+        prevIndex >= updatedImages.length ? updatedImages.length - 1 : prevIndex
+      );
+    } catch (error) {
+      console.error("Error deleting image:", error);
+    }
+  };
+
+  const [selectedImages, setSelectedImages] = useState<number[]>([]);
+
+  const toggleImageSelection = (index: number) => {
+    setSelectedImages((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
+  };
+  
+  const handleBulkDelete = async () => {
+    const updatedImages = currentProperty.imageUrls.filter((_, idx: number) => !selectedImages.includes(idx));
+  
+    // Remove selected images from Firebase Storage
+    await Promise.all(
+      selectedImages.map((index) => {
+        const imageRef = ref(storage, currentProperty.imageUrls[index]);
+        return deleteObject(imageRef);
+      })
+    );
+  
+    // Update property with remaining images
+    setCurrentProperty({ ...currentProperty, imageUrls: updatedImages });
+  
+    // Update the properties state to reflect the changes
+    setProperties((prevProperties) =>
+      prevProperties.map((property) =>
+        property.id === currentProperty.id
+          ? { ...property, imageUrls: updatedImages }
+          : property
+      )
+    );
+  
+    setSelectedImages([]);
+  };
+  
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const uploadedUrls = await Promise.all(
+        Array.from(files).map(async (file) => {
+          const imageRef = ref(storage, `properties/${Date.now()}-${file.name}`);
+          await uploadBytes(imageRef, file);
+          return await getDownloadURL(imageRef);
+        })
+      );
+      setCurrentProperty({ ...currentProperty, imageUrls: [...currentProperty.imageUrls, ...uploadedUrls] });
+    }
+  };
+
+  const handleDeleteProperty = async (propertyId, imageUrls) => {
+    try {
+      // Delete all images associated with the property from Firebase Storage
+      await Promise.all(
+        imageUrls.map((url) => {
+          const imageRef = ref(storage, url);
+          return deleteObject(imageRef);
+        })
+      );
+  
+      // Delete the property document from Firestore
+      const propertyRef = doc(firestore, 'properties', propertyId);
+      await deleteDoc(propertyRef);
+  
+      // Update properties state to remove the deleted property from the list
+      setProperties((prevProperties) =>
+        prevProperties.filter((property) => property.id !== propertyId)
+      );
+  
+      // Close the modal and reset currentProperty
+      setIsModalOpen(false);
+      setCurrentProperty(null);
+  
+      console.log(`Property ${propertyId} and associated images deleted successfully`);
+    } catch (error) {
+      console.error("Error deleting property:", error);
+    }
+  };
+
+
+
 
   if (!userId) return <p>Please log in to view your properties.</p>;
 
@@ -145,20 +299,63 @@ const MyPropertiesPage = () => {
 
         {/* Embla Carousel for Thumbnails */}
         <div className="embla w-full h-24 overflow-hidden" ref={emblaRef}>
-          <div className="embla__container flex space-x-2">
-            {currentProperty.imageUrls?.map((url: string, idx: number) => (
-              <div key={idx} className="embla__slide flex-none w-24 h-24">
-                <img
-                  src={url}
-                  alt={`Thumbnail ${idx + 1}`}
-                  className={`w-full h-full object-cover rounded-lg cursor-pointer ${selectedImageIndex === idx ? 'border-2 border-blue-500' : ''}`}
-                  onClick={() => handleThumbnailClick(idx)}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+  <div className="embla__container flex space-x-2">
+    {currentProperty.imageUrls?.map((url: string, idx: number) => (
+      <div key={idx} className="embla__slide flex-none w-24 h-24 relative group">
+        <img
+          src={url}
+          alt={`Thumbnail ${idx + 1}`}
+          className={`w-full h-full object-cover rounded-lg cursor-pointer ${selectedImageIndex === idx ? 'border-2 border-blue-500' : ''}`}
+          onClick={() => handleThumbnailClick(idx)}
+        />
+        
+        {/* Delete Button, shown on hover */}
+        <button
+          onClick={() => handleRemoveImage(idx)}
+          className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        >
+          <FaRegTrashCan />
+        </button>
+
+        {/* Checkbox for Bulk Selection */}
+        <input
+          type="checkbox"
+          checked={selectedImages.includes(idx)}
+          onChange={() => toggleImageSelection(idx)}
+          className="absolute bottom-1 left-1"
+        />
       </div>
+    ))}
+  </div>
+</div>
+
+{/* Bulk Delete and Upload Section */}
+<div className="mt-4 flex space-x-4">
+<button
+    onClick={handleBulkDelete}
+    className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 flex-1"
+  >
+    Delete Images {selectedImages.length > 0 && `(${selectedImages.length})`}
+  </button>
+  <div className="flex-1">
+    <input
+      type="file"
+      multiple
+      onChange={handleImageUpload}
+      className="hidden"
+      id="file-upload"
+    />
+    <label
+      htmlFor="file-upload"
+      className="bg-blue-500 text-white py-2 px-4 rounded cursor-pointer hover:bg-blue-600 w-full block text-center"
+    >
+      Upload Images
+    </label>
+  </div>
+</div>
+</div>
+
+
 
       {/* Right Side: Edit Form */}
       <div className="w-2/3 overflow-y-auto max-h-[65vh] pr-4">
@@ -342,19 +539,27 @@ const MyPropertiesPage = () => {
         </div>
 
         {/* Update and Cancel Buttons */}
-        <div className="sticky bottom-0 left-0 right-0 bg-white p-4 flex justify-center border-t border-gray-200">
+        <div className="sticky bottom-0 left-0 right-0 bg-white p-4 flex justify-between border-t border-gray-200">
   <button
-    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-    onClick={handleUpdateProperty}
+    className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+    onClick={() => handleDeleteProperty(currentProperty.id, currentProperty.imageUrls)}
   >
-    Save Changes
+    Delete Property
   </button>
-  <button
-    className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 ml-4"
-    onClick={() => setIsModalOpen(false)}
-  >
-    Cancel
-  </button>
+  <div className="flex">
+    <button
+      className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+      onClick={handleUpdateProperty}
+    >
+      Save Changes
+    </button>
+    <button
+      className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 ml-4"
+      onClick={() => setIsModalOpen(false)}
+    >
+      Cancel
+    </button>
+  </div>
 </div>
       </div>
     </div>

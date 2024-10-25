@@ -1,5 +1,5 @@
 import { useUser, UserButton, UserProfile } from '@clerk/nextjs';
-import { FaUser, FaCreditCard, FaFileContract, FaLock, FaPlus } from 'react-icons/fa'; // Importing icons
+import { FaUser, FaCreditCard, FaFileContract, FaLock, FaPlus, FaEdit  } from 'react-icons/fa'; // Importing icons
 import { FiLogOut } from 'react-icons/fi'; // Importing logout icon
 import { useState } from 'react';
 import Link from 'next/link';
@@ -58,7 +58,7 @@ const Profile = () => {
           </li>
           <li className="flex items-center justify-between py-2 border-b">
             <Link href="/my-properties" className="flex items-center">
-              <FaPlus className="mr-2" /> 
+              <FaEdit  className="mr-2" /> 
               My Properties
             </Link>
             <span>&gt;</span>

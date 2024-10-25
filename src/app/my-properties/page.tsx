@@ -17,6 +17,7 @@ const MyPropertiesPage = () => {
   const [currentProperty, setCurrentProperty] = useState<any>(null);
   const { userId } = useAuth();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
 
@@ -120,6 +121,13 @@ const MyPropertiesPage = () => {
   };
 
 
+  const resetModalState = () => {
+    setCurrentProperty(null);
+    setSelectedImageIndex(0);
+    setSelectedImages([]);
+    setSelectedFiles(null);
+  };
+
 
   const storage = getStorage(); // Initialize storage
 
@@ -196,6 +204,7 @@ const MyPropertiesPage = () => {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
+      setSelectedFiles(files);
       const uploadedUrls = await Promise.all(
         Array.from(files).map(async (file) => {
           const imageRef = ref(storage, `properties/${Date.now()}-${file.name}`);
@@ -263,14 +272,22 @@ const MyPropertiesPage = () => {
                 <p className="text-gray-600 mt-1">Price: €{property.price}</p>
                 <p className="text-gray-500 mt-2">{property.description.slice(0, 100)}...</p>
 
-                {/* Edit Button */}
-                <button
-                  className="bg-blue-500 text-white py-2 px-4 rounded mt-4 hover:bg-blue-600"
-                  onClick={() => handleEditClick(property)}
-                >
-                  Edit
-                </button>
-              </div>
+              {/* Edit Button */}
+  <button
+    className="bg-blue-500 text-white py-2 px-4 rounded mt-4 hover:bg-blue-600"
+    onClick={() => handleEditClick(property)}
+  >
+    Edit
+  </button>
+
+  {/* Delete Button */}
+  <button
+    className="bg-red-500 text-white py-2 px-4 rounded mt-4 hover:bg-red-600 ml-4"
+    onClick={() => handleDeleteProperty(property.id, property.imageUrls)}
+  >
+    Delete
+  </button>
+</div>
             </li>
           ))}
         </ul>
@@ -280,11 +297,14 @@ const MyPropertiesPage = () => {
 
       {/* Edit Modal using react-modal */}
       <Modal
-  isOpen={isModalOpen}
-  onRequestClose={() => setIsModalOpen(false)}
-  contentLabel="Edit Property"
-  className="bg-white p-6 rounded-lg max-w-3xl w-full mx-auto shadow-lg"
-  overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center"
+isOpen={isModalOpen}
+onRequestClose={() => {
+  setIsModalOpen(false);
+  resetModalState();
+}}
+contentLabel="Edit Property"
+className="bg-white p-6 rounded-lg max-w-3xl w-full mx-auto shadow-lg"
+overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center"
 >
   {currentProperty && (
     <div className="flex">
@@ -349,7 +369,7 @@ const MyPropertiesPage = () => {
       htmlFor="file-upload"
       className="bg-blue-500 text-white py-2 px-4 rounded cursor-pointer hover:bg-blue-600 w-full block text-center"
     >
-      Upload Images
+      Upload Images {selectedFiles && `(${selectedFiles.length})`}
     </label>
   </div>
 </div>
@@ -554,10 +574,13 @@ const MyPropertiesPage = () => {
       Save Changes
     </button>
     <button
-      className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 ml-4"
-      onClick={() => setIsModalOpen(false)}
-    >
-      Cancel
+  className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 ml-4"
+  onClick={() => {
+    setIsModalOpen(false);
+    resetModalState();
+  }}
+>
+  Cancel
     </button>
   </div>
 </div>

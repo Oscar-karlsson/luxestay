@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import propertyData from '../../../data/properties.json'; 
+import { doc, getDoc } from 'firebase/firestore';
+import { firestore } from '@/utils/firebase';
 import { AiFillStar } from 'react-icons/ai';
 import { IoIosArrowBack } from "react-icons/io";
 import FavoriteStar from '@/components/FavoriteStar';
@@ -20,8 +21,7 @@ const PropertyDetail = () => {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [isShowMoreModalOpen, setIsShowMoreModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState<React.ReactNode>(null);
-    const propertyId = parseInt(id as string);
-    const property = propertyData.find((prop) => prop.id === propertyId);
+    const [property, setProperty] = useState<any>(null);
     const [emblaRef, emblaApi] = EmblaCarouselReact({ loop: false, slidesToScroll: 1 });
 
     // Set initial "Show More" state for different sections
@@ -38,6 +38,23 @@ const PropertyDetail = () => {
         houseRules: 2      // Show 2 house rules initially
     };
 
+    useEffect(() => {
+        const fetchProperty = async () => {
+            const docRef = doc(firestore, 'properties', id as string);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                setProperty({ id: docSnap.id, ...docSnap.data() });
+            } else {
+                console.log('Property not found');
+                router.push('/404'); // Redirect to a 404 page if the property is not found
+            }
+        };
+
+        fetchProperty();
+    }, [id, router]);
+    
+
     // Function to set the content for the modal based on the section
     const handleShowMoreToggle = (section: ShowMoreSection | 'review', content: string = '') => {
         let modalContent;
@@ -53,9 +70,9 @@ const PropertyDetail = () => {
         } else if (section === 'houseRules') {
             modalContent = (
                 <ul className="space-y-1 mt-2">
-                    {Object.entries(property?.details?.houseRules || {}).map(([key, value], index) => (
-                        <li key={index} className="text-gray-600">{`${key}: ${value}`}</li>
-                    ))}
+                {property?.houseRules && property.houseRules.map((rule, index) => (
+    <li key={index} className="text-gray-600">{rule}</li>
+))}
                 </ul>
             );
         } else if (section === 'description') {
@@ -68,7 +85,23 @@ const PropertyDetail = () => {
         setIsShowMoreModalOpen(true);  // Open the modal
     };
 
-    if (!property) return <div>Property not found</div>;
+    useEffect(() => {
+        const fetchProperty = async () => {
+            const docRef = doc(firestore, 'properties', id as string);
+            const docSnap = await getDoc(docRef);
+    
+            if (docSnap.exists()) {
+                setProperty({ id: docSnap.id, ...docSnap.data() });
+            } else {
+                console.log('Property not found');
+                router.push('/404'); // Redirect to a 404 page if the property is not found
+            }
+        };
+    
+        fetchProperty();
+    }, [id, router]);
+
+    
 
     // Check screen size on component mount
     useEffect(() => {
@@ -89,8 +122,8 @@ const PropertyDetail = () => {
         <div className="md:max-w-5xl md:mx-auto pb-16">
             {/* Title for larger screens */}
             <div className="hidden md:block text-2xl font-bold mb-4 md:mt-4">
-            {property?.title}
-            </div>
+    {property?.title || 'No Title Available'}
+</div>
 
             {/* Property Image Section */}
             <div className="relative mb-4">
@@ -99,13 +132,19 @@ const PropertyDetail = () => {
                     onClick={() => router.back()}>
                     <IoIosArrowBack className="text-2xl" />
                 </button>
-                <img
-                   src={property?.images?.[0]}
-                   alt={property?.title} 
-                    className="w-full h-auto object-cover"
-                />
+                {property?.imageUrls && property.imageUrls.length > 0 ? (
+    <img
+        src={property.imageUrls[0]}  // Access the first image in the array
+        alt={property.title || 'Property Image'} 
+        className="w-full h-auto object-cover"
+    />
+) : (
+    <div className="w-full h-48 bg-gray-300 flex items-center justify-center">
+        No Image Available
+    </div>
+)}
                 <div className="absolute top-4 right-4">
-                    <FavoriteStar isFavorite={property.isFavorite} />
+                {property && <FavoriteStar isFavorite={property?.isFavorite || false} />}
                 </div>
             </div>
 
@@ -113,17 +152,23 @@ const PropertyDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Property Details Section */}
                 <div className="space-y-4 p-4">
-                    <h1 className="text-2xl font-bold md:hidden">{property.title}</h1>
+                {property && <h1 className="text-2xl font-bold md:hidden">{property.title}</h1>}
 
-                    <div className="flex items-center space-x-2">
-                        <span>{property.location}</span>
-                        <div className="flex items-center">
-                            <AiFillStar className="text-yellow-500" />
-                            <span className="ml-1 text-gray-600">{property.rating.toFixed(1)}</span>
-                        </div>
-                    </div>
+                {property && (
+    <div className="flex items-center space-x-2">
+        <span>{`${property.city}, ${property.country}`}</span>
+        <div className="flex items-center">
+            <AiFillStar className="text-yellow-500" />
+            <span className="ml-1 text-gray-600">
+                {typeof property.rating === 'number' ? property.rating.toFixed(1) : '0.00'}
+            </span>
+        </div>
+    </div>
+)}
 
-                    <p className="text-gray-700 mt-2">{property?.details?.description}</p>
+                    <p className="text-gray-700 mt-2">
+    {property?.description || 'No Description Available'}
+</p>
                     {/* Show More button for description */}
                     {property?.details?.description.length > maxItemsToShow.description && (
                 <button
@@ -136,14 +181,16 @@ const PropertyDetail = () => {
 
                     {/* Divider */}
                     <hr className="block md:hidden my-4 border-t border-divider" />
-                    <p className="text-sm text-gray-500 flex items-center">
-                        <img
-                            src="/profile.png"
-                            alt="Profile"
-                            className="w-10 h-10 rounded-full mr-2"
-                        />
-                        Hosted by {property.details.hostedBy}
-                    </p>
+                    {property?.details && (
+    <p className="text-sm text-gray-500 flex items-center">
+        <img
+            src="/profile.png"
+            alt="Profile"
+            className="w-10 h-10 rounded-full mr-2"
+        />
+        {property?.details?.hostedBy && `Hosted by ${property.details.hostedBy}`}
+    </p>
+)}
 
                     {/* Divider */}
                     <hr className="block md:hidden my-4 border-t border-divider" />
@@ -151,7 +198,9 @@ const PropertyDetail = () => {
                     {/* Map Section */}
                     <div className="mt-6">
                         <h2 className="text-lg font-bold">Where you'll be</h2>
-                        <img src={property.details.mapUrl} alt="Map" className="w-full h-48 object-cover mt-2" />
+                        {property?.details?.mapUrl && (
+    <img src={property.details.mapUrl} alt="Map" className="w-full h-48 object-cover mt-2" />
+)}
                     </div>
 
                     {/* Divider */}
@@ -161,12 +210,11 @@ const PropertyDetail = () => {
                     <div className="mt-6">
                         <h2 className="text-lg font-bold">What this place offers</h2>
                         <ul className="space-y-1 mt-2">
-                            {property.details.features
-                                .slice(0, showMore.features ? property.details.features.length : maxItemsToShow.features)
-                                .map((feature, index) => (
-                                    <li key={index} className="text-gray-600">{feature}</li>
-                                ))
-                            }
+                        {property?.features &&
+    property.features.slice(0, showMore.features ? property.features.length : maxItemsToShow.features)
+    .map((feature, index) => (
+        <li key={index} className="text-gray-600">{feature}</li>
+    ))}
                         </ul>
                         {property?.details?.features.length > maxItemsToShow.features && (
                             <button
@@ -183,27 +231,52 @@ const PropertyDetail = () => {
 
                     {/* House Rules */}
                     <div className="mt-6">
-                        <h2 className="text-lg font-bold">House rules</h2>
-                        <ul className="space-y-1 mt-2">
-                            {Object.entries(property.details.houseRules)
-                                .slice(0, showMore.houseRules ? Object.keys(property.details.houseRules).length : maxItemsToShow.houseRules)
-                                .map(([key, value], index) => (
-                                    <li key={index} className="text-gray-600">{`${key}: ${value}`}</li>
-                                ))
-                            }
-                        </ul>
-                        {Object.keys(property?.details?.houseRules || {}).length > maxItemsToShow.houseRules && (
-                            <button
-                                onClick={() => handleShowMoreToggle('houseRules')}
-                                className="text-blue-500 underline mt-2"
-                            >
-                                {showMore.houseRules ? "Show Less" : "Show More"}
-                            </button>
-                        )}
-                    </div>
+    <h2 className="text-lg font-bold">House rules</h2>
+    <ul className="space-y-1 mt-2">
+        {property?.houseRules && property.houseRules
+            .slice(0, showMore.houseRules ? property.houseRules.length : maxItemsToShow.houseRules)
+            .map((rule, index) => (
+                <li key={index} className="text-gray-600">{rule}</li>
+            ))
+        }
+    </ul>
+    {property?.houseRules?.length > maxItemsToShow.houseRules && (
+        <button
+            onClick={() => handleShowMoreToggle('houseRules')}
+            className="text-blue-500 underline mt-2"
+        >
+            {showMore.houseRules ? "Show Less" : "Show More"}
+        </button>
+    )}
+</div>
 
                     {/* Divider */}
                     <hr className="block md:hidden my-4 border-t border-divider" />
+
+{/* Services */}
+<div className="mt-6">
+    <h2 className="text-lg font-bold">Services</h2>
+    <ul className="space-y-1 mt-2">
+        {property?.services &&
+            property.services
+                .slice(0, showMore.services ? property.services.length : maxItemsToShow.services)
+                .map((service, index) => (
+                    <li key={index} className="text-gray-600">{service}</li>
+                ))
+        }
+    </ul>
+    {property?.services?.length > maxItemsToShow.services && (
+        <button
+            onClick={() => handleShowMoreToggle('services')}
+            className="text-blue-500 underline mt-2"
+        >
+            {showMore.services ? "Show Less" : "Show More"}
+        </button>
+    )}
+</div>
+
+  {/* Divider */}
+  <hr className="block md:hidden my-4 border-t border-divider" />
 
 {/* Reviews Section */}
 <div className="mt-6">
@@ -213,7 +286,7 @@ const PropertyDetail = () => {
   <div className="overflow-hidden w-full max-w-5xl mx-auto"> {/* Ensures the slider is within the container */}
     <div className="embla review-slider" ref={emblaRef}>
       <div className="embla__container">
-        {property.details.reviews.map((review, index) => (
+        {property?.details?.reviews && property.details.reviews.map((review, index) => (
           <div className="embla__slide" key={index}>
             <ReviewCard
               name={review.name}
@@ -235,13 +308,13 @@ const PropertyDetail = () => {
 
                 {/* Booking Box for Large Screens */}
                 <div className="hidden md:block md:sticky md:top-4 md:h-[calc(100vh-30rem)]">
-    <BookingBoxLarge pricePerNight={property.pricePerNight} />
+                {property && <BookingBoxLarge pricePerNight={parseFloat(property.price)} />}
 </div>
             </div>
 
             {/* Booking Bar for Small Screens */}
             <div className="block md:hidden fixed bottom-0 left-0 right-0 z-50">
-                <BookingBarSmall pricePerNight={property.pricePerNight} />
+            {property && <BookingBarSmall pricePerNight={parseFloat(property.price)} />}
             </div>
         </div>
     );

@@ -22,6 +22,7 @@ const PropertyDetail = () => {
     const [isShowMoreModalOpen, setIsShowMoreModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState<React.ReactNode>(null);
     const [property, setProperty] = useState<any>(null);
+    const [host, setHost] = useState<any>(null);
     const [emblaRef, emblaApi] = EmblaCarouselReact({ loop: false, slidesToScroll: 1 });
 
     // Set initial "Show More" state for different sections
@@ -38,21 +39,7 @@ const PropertyDetail = () => {
         houseRules: 2      // Show 2 house rules initially
     };
 
-    useEffect(() => {
-        const fetchProperty = async () => {
-            const docRef = doc(firestore, 'properties', id as string);
-            const docSnap = await getDoc(docRef);
 
-            if (docSnap.exists()) {
-                setProperty({ id: docSnap.id, ...docSnap.data() });
-            } else {
-                console.log('Property not found');
-                router.push('/404'); // Redirect to a 404 page if the property is not found
-            }
-        };
-
-        fetchProperty();
-    }, [id, router]);
     
 
     // Function to set the content for the modal based on the section
@@ -87,14 +74,26 @@ const PropertyDetail = () => {
 
     useEffect(() => {
         const fetchProperty = async () => {
-            const docRef = doc(firestore, 'properties', id as string);
-            const docSnap = await getDoc(docRef);
+            try {
+                const docRef = doc(firestore, 'properties', id as string);
+                const docSnap = await getDoc(docRef);
     
-            if (docSnap.exists()) {
-                setProperty({ id: docSnap.id, ...docSnap.data() });
-            } else {
-                console.log('Property not found');
-                router.push('/404'); // Redirect to a 404 page if the property is not found
+                if (docSnap.exists()) {
+                    const propertyData = { id: docSnap.id, ...docSnap.data() };
+                    setProperty(propertyData);
+    
+                    // Fetch host data via API route
+                    if (propertyData.userId) {
+                        const response = await fetch(`/api/fetchHost?userId=${propertyData.userId}`);
+                        const hostData = await response.json();
+                        setHost(hostData);
+                    }
+                } else {
+                    console.log('Property not found');
+                    router.push('/404');
+                }
+            } catch (error) {
+                console.error('Error fetching property or host data:', error);
             }
         };
     
@@ -181,14 +180,14 @@ const PropertyDetail = () => {
 
                     {/* Divider */}
                     <hr className="block md:hidden my-4 border-t border-divider" />
-                    {property?.details && (
+                    {host && (
     <p className="text-sm text-gray-500 flex items-center">
         <img
-            src="/profile.png"
-            alt="Profile"
+            src={host.profileImageUrl || "/default-profile.png"}
+            alt="Host Profile"
             className="w-10 h-10 rounded-full mr-2"
         />
-        {property?.details?.hostedBy && `Hosted by ${property.details.hostedBy}`}
+        {`Hosted by ${host.firstName || ''} ${host.lastName || ''}`}
     </p>
 )}
 

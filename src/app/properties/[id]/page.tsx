@@ -12,8 +12,10 @@ import CustomModal from '@/components/CustomModal';
 import ShowMoreModal from '@/components/ShowMoreModal';
 import ReviewCard from '@/components/ReviewCard';
 import EmblaCarouselReact from 'embla-carousel-react';
+import PropertyMap from '@/components/PropertyMap';
+import Image from 'next/image';
 
-type ShowMoreSection = 'description' | 'features' | 'houseRules';
+type ShowMoreSection = 'description' | 'features' | 'houseRules' | 'services';
 
 const PropertyDetail = () => {
     const { id } = useParams();
@@ -29,14 +31,16 @@ const PropertyDetail = () => {
     const [showMore, setShowMore] = useState({
         description: false,
         features: false,
-        houseRules: false
+        houseRules: false,
+        services: false
     });
 
     // Control how many items to show initially for each section
     const maxItemsToShow = {
-        description: 150,  // Number of characters for description (optional, you can remove this if not needed)
-        features: 3,       // Show 3 features initially
-        houseRules: 2      // Show 2 house rules initially
+        description: 150,  // Number of characters for description before truncating
+        features: 3,       // Show 3 features initially 
+        houseRules: 2,     // Show 2 house rules initially
+        services: 2        // Show 3 services initially
     };
 
 
@@ -57,9 +61,17 @@ const PropertyDetail = () => {
         } else if (section === 'houseRules') {
             modalContent = (
                 <ul className="space-y-1 mt-2">
-                {property?.houseRules && property.houseRules.map((rule, index) => (
-    <li key={index} className="text-gray-600">{rule}</li>
-))}
+                    {property?.houseRules && property.houseRules.map((rule, index) => (
+                        <li key={index} className="text-gray-600">{rule}</li>
+                    ))}
+                </ul>
+            );
+        } else if (section === 'services') {
+            modalContent = (
+                <ul className="space-y-1 mt-2">
+                    {property?.services && property.services.map((service, index) => (
+                        <li key={index} className="text-gray-600">{service}</li>
+                    ))}
                 </ul>
             );
         } else if (section === 'description') {
@@ -132,11 +144,14 @@ const PropertyDetail = () => {
                     <IoIosArrowBack className="text-2xl" />
                 </button>
                 {property?.imageUrls && property.imageUrls.length > 0 ? (
-    <img
-        src={property.imageUrls[0]}  // Access the first image in the array
-        alt={property.title || 'Property Image'} 
-        className="w-full h-auto object-cover"
-    />
+    <Image
+    src={property.imageUrls[0]}  // Access the first image in the array
+    alt={property.title || 'Property Image'} 
+    width={1200}  // Set the width
+    height={800} // Set the height
+    layout="responsive"  
+    className="w-full h-auto object-cover max-h-96" 
+/>
 ) : (
     <div className="w-full h-48 bg-gray-300 flex items-center justify-center">
         No Image Available
@@ -197,9 +212,13 @@ const PropertyDetail = () => {
                     {/* Map Section */}
                     <div className="mt-6">
                         <h2 className="text-lg font-bold">Where you'll be</h2>
-                        {property?.details?.mapUrl && (
-    <img src={property.details.mapUrl} alt="Map" className="w-full h-48 object-cover mt-2" />
-)}
+                        {property?.latitude && property?.longitude && (
+                            <PropertyMap
+                                latitude={property.latitude}
+                                longitude={property.longitude}
+                                title={property.title}
+                            />
+                        )}
                     </div>
 
                     {/* Divider */}

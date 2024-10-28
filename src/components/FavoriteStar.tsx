@@ -1,8 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { addFavorite, removeFavorite } from '@/services/favoritesService';
 import { useUser } from '@clerk/clerk-react'; // Import useUser from Clerk
+import { getDoc, doc } from 'firebase/firestore';
+import { firestore } from '@/utils/firebase';
 
 interface FavoriteStarProps {
   propertyId: string;
@@ -12,6 +14,20 @@ interface FavoriteStarProps {
 const FavoriteStar: React.FC<FavoriteStarProps> = ({ propertyId, isFavorite }) => {
   const { user } = useUser(); // Get the current user
   const [favorite, setFavorite] = useState(isFavorite);
+
+
+
+  useEffect(() => {
+    const fetchFavoriteState = async () => {
+      if (!user) return;
+      const userId = user.id;
+      const favoriteDocRef = doc(firestore, "favorites", `${userId}_${propertyId}`);
+      const docSnapshot = await getDoc(favoriteDocRef);
+      setFavorite(docSnapshot.exists());
+    };
+
+    fetchFavoriteState();
+  }, [user, propertyId]);
 
   const handleToggleFavorite = async () => {
     if (!user) {

@@ -32,7 +32,7 @@ const Explore = () => {
   }
 
   return (
-    <div className="p-4">
+    <div className="container mx-auto p-6">
       {/* Search Bar */}
       <div className="sticky top-0 z-50 md:hidden">
         <SearchBar placeholder="Where to?" />

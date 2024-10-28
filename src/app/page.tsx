@@ -46,11 +46,13 @@ const Explore = () => {
             key={property.id}
             id={property.id}
             title={property.title}
-            location={`${property.address}, ${property.city}, ${property.country}`}
-            pricePerNight={parseFloat(property.price) || 0}
+            city={property.city}
+            country={property.country}
+            price={property.price}
             rating={property.rating ? parseFloat(property.rating) : 0}
             isFavorite={property.isFavorite || false}
-            images={property.imageUrls || []}  // Handle cases where no images are available
+            userId={property.userId}
+            imageUrls={property.imageUrls || []}   // Handle cases where no images are available
             />
           ))
         ) : (

@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { addFavorite, removeFavorite } from '@/services/favoritesService';

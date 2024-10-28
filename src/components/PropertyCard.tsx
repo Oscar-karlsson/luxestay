@@ -6,28 +6,31 @@ import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { IoIosArrowForward,IoIosArrowBack } from "react-icons/io";
 import FavoriteStar from './FavoriteStar';
 import { formatPrice } from '@/utils/formatPrice';
+import Image from 'next/image';
 
 
 interface PropertyCardProps {
-  id:number;
+  id: string;
   title: string;
-  location: string;
-  pricePerNight: number;
+  city: string;
+  country: string;
+  price: string;
   rating: number;
   isFavorite: boolean;
   userId: string;
-  images: string[]; // Array of images for the slider
+  imageUrls: string[];
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
   id,
   title,
-  location,
-  pricePerNight,
+  city,
+  country,
+  price,
   rating,
   isFavorite,
   userId,
-  images
+  imageUrls
 }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -66,7 +69,7 @@ const [atEnd, setAtEnd] = useState(false);
   }, [emblaApi, onSelect]);
 
 
-  const formattedPrice = formatPrice(pricePerNight); // Use the utility function
+  const formattedPrice = formatPrice(Number(price)); // Use the utility function
 
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden relative">
@@ -81,23 +84,30 @@ const [atEnd, setAtEnd] = useState(false);
       <div className="cursor-pointer">
         {/* Embla Carousel for Images */}
         <div className="relative">
-          {images && images.length > 0 ? (
-            <div className="embla" ref={emblaRef}>
-              <div className="embla__container flex">
-                {images.map((image, index) => (
-                  <div key={index} className="embla__slide flex-shrink-0 w-full">
-                    <img src={image} alt={`${title} Image ${index + 1}`} className="w-full h-48 object-cover" />
-                  </div>
-                ))}
-              </div>
-              {!atStart && <button className="arrow arrow--prev" onClick={scrollPrev}><IoIosArrowBack /></button>}
-              {!atEnd && <button className="arrow arrow--next" onClick={scrollNext}><IoIosArrowForward /></button>}
-            </div>
-          ) : (
-            <div className="w-full h-48 bg-gray-300 flex items-center justify-center">
-              <span>No Image Available</span>
-            </div>
-          )}
+        {imageUrls && imageUrls.length > 0 ? (
+    <div className="embla" ref={emblaRef}>
+        <div className="embla__container flex">
+            {imageUrls.map((image, index) => (
+                <div key={index} className="embla__slide flex-shrink-0 w-full h-48 lg:h-64 relative">
+                    <Image 
+                        src={image} 
+                        alt={`${title} Image ${index + 1}`} 
+                        layout="fill" 
+                        objectFit="cover" 
+                        className="rounded-lg" 
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+          </div>
+        ))}
+      </div>
+      {!atStart && <button className="arrow arrow--prev" onClick={scrollPrev}><IoIosArrowBack /></button>}
+      {!atEnd && <button className="arrow arrow--next" onClick={scrollNext}><IoIosArrowForward /></button>}
+    </div>
+  ) : (
+    <div className="w-full h-48 bg-gray-300 flex items-center justify-center">
+      <span>No Image Available</span>
+    </div>
+  )}
 
           {/* Pagination Dots */}
           <div className="absolute bottom-0 left-0 right-0 flex justify-center mb-4">
@@ -120,7 +130,9 @@ const [atEnd, setAtEnd] = useState(false);
               <span className="ml-2 text-secondaryText text-b1-mobile sm:text-b1-desktop">{rating.toFixed(2)}</span>
             </div>
           </div>
-          <p className="text-primaryText font-medium mt-2 text-b1-mobile sm:text-b1-desktop">{location}</p>
+          <p className="text-primaryText font-medium mt-2 text-b1-mobile sm:text-b1-desktop">
+  {city}, {country}
+</p>
           <p className="text-secondaryText font-regular mt-2 text-b4-mobile sm:text-b4-desktop">From {formattedPrice} / night</p>
         </div>
       </div>

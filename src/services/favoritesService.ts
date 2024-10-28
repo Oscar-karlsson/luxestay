@@ -1,4 +1,4 @@
-import { doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, deleteDoc, getDoc, query, where, getDocs, collection } from "firebase/firestore";
 import { firestore } from "../utils/firebase"; // Ensure this path is correct
 
 // Type for the function parameters
@@ -42,5 +42,27 @@ export const removeFavorite = async ({ userId, propertyId }: FavoriteParams): Pr
     }
   } catch (error) {
     console.error("Error removing favorite:", error);
+  }
+};
+
+
+
+// Function to fetch all favorite properties for a given user
+export const fetchFavoriteProperties = async (userId: string): Promise<Property[]> => {
+  try {
+    const favoritesQuery = query(collection(firestore, 'favorites'), where('userId', '==', userId));
+    const favoriteDocs = await getDocs(favoritesQuery);
+
+    // Retrieve full property data for each favorite
+    const propertyPromises = favoriteDocs.docs.map(async (docSnapshot) => {
+      const { propertyId } = docSnapshot.data();
+      const propertyDoc = await getDoc(doc(firestore, 'properties', propertyId));
+      return { id: propertyId, ...propertyDoc.data() } as Property;
+    });
+
+    return await Promise.all(propertyPromises);
+  } catch (error) {
+    console.error("Error fetching favorite properties:", error);
+    throw error;
   }
 };

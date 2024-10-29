@@ -14,6 +14,7 @@ import ReviewCard from '@/components/ReviewCard';
 import EmblaCarouselReact from 'embla-carousel-react';
 import PropertyMap from '@/components/PropertyMap';
 import Image from 'next/image';
+import { useUser } from '@clerk/clerk-react';
 
 type ShowMoreSection = 'description' | 'features' | 'houseRules' | 'services';
 
@@ -26,6 +27,8 @@ const PropertyDetail = () => {
     const [property, setProperty] = useState<any>(null);
     const [host, setHost] = useState<any>(null);
     const [emblaRef, emblaApi] = EmblaCarouselReact({ loop: false, slidesToScroll: 1 });
+    const { user } = useUser();
+const userId = user ? user.id : '';
 
     // Set initial "Show More" state for different sections
     const [showMore, setShowMore] = useState({
@@ -157,9 +160,9 @@ const PropertyDetail = () => {
         No Image Available
     </div>
 )}
-                <div className="absolute top-4 right-4">
-                {property && <FavoriteStar isFavorite={property?.isFavorite || false} />}
-                </div>
+             <div className="absolute top-4 right-4">
+  {property && <FavoriteStar isFavorite={property?.isFavorite || false} propertyId={property.id} userId={userId} />}
+</div>
             </div>
 
             {/* Grid Layout for Content and Booking Box on Large Screens */}
@@ -210,7 +213,7 @@ const PropertyDetail = () => {
                     <hr className="block md:hidden my-4 border-t border-divider" />
 
                     {/* Map Section */}
-                    <div className="mt-6">
+                    <div className="mt-6 relative z-0">
                         <h2 className="text-lg font-bold">Where you'll be</h2>
                         {property?.latitude && property?.longitude && (
                             <PropertyMap

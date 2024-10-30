@@ -7,7 +7,7 @@ import { firestore } from '@/utils/firebase';
 import { useAuth } from '@clerk/nextjs';
 import Modal from 'react-modal'; 
 import useEmblaCarousel from 'embla-carousel-react';
-import { featuresOptions, houseRulesOptions, servicesOptions } from '@/data/propertyOptions';
+import { featuresOptions, houseRulesOptions, servicesOptions, safetyFeaturesOptions, propertyTypeOptions, nearbyAttractionsOptions } from '@/data/propertyOptions';
 import { FaRegTrashCan } from "react-icons/fa6";
 
 
@@ -81,7 +81,18 @@ const MyPropertiesPage = () => {
   const handleUpdateProperty = async () => {
     try {
       const propertyRef = doc(firestore, 'properties', currentProperty.id);
-      await updateDoc(propertyRef, currentProperty);
+      await updateDoc(propertyRef, {
+        ...currentProperty,
+        safetyFeatures: currentProperty.safetyFeatures || [],
+        propertyType: currentProperty.propertyType || '',
+        nearbyAttractions: currentProperty.nearbyAttractions || [],
+        maxGuests: currentProperty.maxGuests || 1,
+        minStay: currentProperty.minStay || 1,
+        blockedDates: currentProperty.blockedDates || [],
+        bedrooms: currentProperty.bedrooms || 1,
+        beds: currentProperty.beds || 1,
+        baths: currentProperty.baths || 1,
+      });
   
       // Update the properties state with the updated property
       setProperties((prevProperties) =>
@@ -108,10 +119,12 @@ const MyPropertiesPage = () => {
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     const { value, checked } = e.target;
+  
     setCurrentProperty((prevProperty: any) => {
+      const existingField = prevProperty[field] || []; // Initialize as empty array if undefined
       const updatedField = checked
-        ? [...prevProperty[field], value]
-        : prevProperty[field].filter((item: string) => item !== value);
+        ? [...existingField, value]
+        : existingField.filter((item: string) => item !== value);
   
       return {
         ...prevProperty,
@@ -245,6 +258,22 @@ const MyPropertiesPage = () => {
     }
   };
 
+
+
+
+  const handleBlockedDateChange = (date) => {
+    setCurrentProperty((prev) => ({
+      ...prev,
+      blockedDates: [...(prev.blockedDates || []), date]
+    }));
+  };
+  
+  const removeBlockedDate = (index) => {
+    setCurrentProperty((prev) => ({
+      ...prev,
+      blockedDates: prev.blockedDates.filter((_, i) => i !== index)
+    }));
+  };
 
 
 
@@ -557,6 +586,150 @@ overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center it
             ))}
           </div>
         </div>
+
+{/* Safety Features Checkboxes */}
+<div className="mb-4">
+  <label className="block mb-2">Safety Features</label>
+  <div className="grid grid-cols-2 gap-2">
+    {safetyFeaturesOptions.map((feature) => (
+      <label key={feature} className="inline-flex items-center">
+        <input
+          type="checkbox"
+          value={feature}
+          checked={currentProperty.safetyFeatures?.includes(feature)}
+          onChange={(e) => handleCheckboxChange(e, 'safetyFeatures')}
+          className="mr-2"
+        />
+        {feature}
+      </label>
+    ))}
+  </div>
+</div>
+
+
+
+{/* Property Type Dropdown */}
+<div className="mb-4">
+  <label className="block mb-2">Property Type</label>
+  <select
+    name="propertyType"
+    value={currentProperty.propertyType || ''}
+    onChange={handleChange}
+    className="border p-2 w-full"
+  >
+    <option value="">Select a Property Type</option>
+    {propertyTypeOptions.map((type) => (
+      <option key={type} value={type}>{type}</option>
+    ))}
+  </select>
+</div>
+
+{/* Nearby Attractions Checkboxes */}
+<div className="mb-4">
+  <label className="block mb-2">Nearby Attractions</label>
+  <div className="grid grid-cols-2 gap-2">
+    {nearbyAttractionsOptions.map((attraction) => (
+      <label key={attraction} className="inline-flex items-center">
+        <input
+          type="checkbox"
+          value={attraction}
+          checked={currentProperty.nearbyAttractions?.includes(attraction)}
+          onChange={(e) => handleCheckboxChange(e, 'nearbyAttractions')}
+          className="mr-2"
+        />
+        {attraction}
+      </label>
+    ))}
+  </div>
+</div>
+
+
+{/* Bedrooms, Beds, Baths, and Max Guests */}
+<div className="mb-4 grid grid-cols-2 gap-4">
+  <div>
+    <label className="block mb-2">Bedrooms</label>
+    <input
+      type="number"
+      name="bedrooms"
+      value={currentProperty.bedrooms || ''}
+      onChange={handleChange}
+      className="border p-2 w-full"
+      required
+    />
+  </div>
+  <div>
+    <label className="block mb-2">Beds</label>
+    <input
+      type="number"
+      name="beds"
+      value={currentProperty.beds || ''}
+      onChange={handleChange}
+      className="border p-2 w-full"
+      required
+    />
+  </div>
+  <div>
+    <label className="block mb-2">Baths</label>
+    <input
+      type="number"
+      name="baths"
+      value={currentProperty.baths || ''}
+      onChange={handleChange}
+      className="border p-2 w-full"
+      required
+    />
+  </div>
+</div>
+
+
+{/* Max Guests and Min Stay Inputs */}
+<div className="mb-4 flex space-x-4">
+  <div>
+    <label className="block mb-2">Max Guests</label>
+    <input
+      type="number"
+      name="maxGuests"
+      min="1"
+      value={currentProperty.maxGuests || ''}
+      onChange={handleChange}
+      className="border p-2 w-full"
+    />
+  </div>
+  <div>
+    <label className="block mb-2">Minimum Stay (Nights)</label>
+    <input
+      type="number"
+      name="minStay"
+      min="1"
+      value={currentProperty.minStay || ''}
+      onChange={handleChange}
+      className="border p-2 w-full"
+    />
+  </div>
+</div>
+
+
+
+{/* Blocked Dates Input */}
+<div className="mb-4">
+  <label className="block mb-2">Blocked Dates</label>
+  <input
+    type="date"
+    onChange={(e) => handleBlockedDateChange(e.target.value)}
+    className="border p-2 w-full"
+  />
+  <div className="mt-2">
+    {currentProperty.blockedDates?.map((date, index) => (
+      <span key={index} className="inline-block bg-gray-200 p-2 m-1 rounded">
+        {date}
+        <button onClick={() => removeBlockedDate(index)} className="ml-2 text-red-500">
+          &times;
+        </button>
+      </span>
+    ))}
+  </div>
+</div>
+
 
         {/* Update and Cancel Buttons */}
         <div className="sticky bottom-0 left-0 right-0 bg-white p-4 flex justify-between border-t border-gray-200">

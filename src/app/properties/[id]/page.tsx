@@ -25,6 +25,9 @@ const PropertyDetail = () => {
     const [isShowMoreModalOpen, setIsShowMoreModalOpen] = useState(false);
     const [modalContent, setModalContent] = useState<React.ReactNode>(null);
     const [property, setProperty] = useState<any>(null);
+    const [selectedCheckIn, setSelectedCheckIn] = useState<string | null>(null);
+    const [selectedCheckOut, setSelectedCheckOut] = useState<string | null>(null);
+    const [selectedGuests, setSelectedGuests] = useState<number>(1);
     const [host, setHost] = useState<any>(null);
     const [emblaRef, emblaApi] = EmblaCarouselReact({ loop: false, slidesToScroll: 1 });
     const { user } = useUser();
@@ -47,7 +50,11 @@ const userId = user ? user.id : '';
     };
 
 
-    
+     // Define the function to navigate to the booking review page
+     const handleRequestBooking = () => {
+        const imageUrl = property.imageUrls?.[0] || '/default-image.jpg';
+        router.push(`/book/${property.id}/review?checkIn=${selectedCheckIn}&checkOut=${selectedCheckOut}&guests=${selectedGuests}&price=${property.price}&title=${encodeURIComponent(property.title)}&location=${encodeURIComponent(property.city)}, ${encodeURIComponent(property.country)}&imageUrl=${encodeURIComponent(imageUrl)}`);
+    };
 
     // Function to set the content for the modal based on the section
     const handleShowMoreToggle = (section: ShowMoreSection | 'review', content: string = '') => {
@@ -328,15 +335,27 @@ const userId = user ? user.id : '';
                 </div>
 
                 {/* Booking Box for Large Screens */}
-                <div className="hidden md:block md:sticky md:top-4 md:h-[calc(100vh-30rem)]">
-                {property && <BookingBoxLarge pricePerNight={parseFloat(property.price)} />}
-</div>
+               <div className="hidden md:block md:sticky md:top-4 md:h-[calc(100vh-30rem)]">
+          {property &&  <BookingBoxLarge
+      price={parseFloat(property.price)}
+      onRequestBooking={handleRequestBooking}
+      setCheckIn={setSelectedCheckIn}
+      setCheckOut={setSelectedCheckOut}
+      setGuests={setSelectedGuests}
+    />}
+        </div>
             </div>
 
             {/* Booking Bar for Small Screens */}
             <div className="block md:hidden fixed bottom-0 left-0 right-0 z-50">
-            {property && <BookingBarSmall pricePerNight={parseFloat(property.price)} />}
-            </div>
+          {property && <BookingBarSmall
+      price={parseFloat(property.price)}
+      onRequestBooking={handleRequestBooking}
+      setCheckIn={setSelectedCheckIn}
+      setCheckOut={setSelectedCheckOut}
+      setGuests={setSelectedGuests}
+    />}
+        </div>
         </div>
     );
 

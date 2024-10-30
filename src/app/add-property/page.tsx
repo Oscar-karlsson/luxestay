@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/utils/firebase';
 import { useAuth } from '@clerk/nextjs';
-import { featuresOptions, houseRulesOptions, servicesOptions } from '@/data/propertyOptions';
+import { featuresOptions, houseRulesOptions, servicesOptions, safetyFeaturesOptions, propertyTypeOptions, nearbyAttractionsOptions } from '@/data/propertyOptions';
+
 import { collection, addDoc, updateDoc } from 'firebase/firestore'; 
 import { firestore } from '@/utils/firebase'; // Import firestore
 
@@ -26,6 +27,14 @@ const AddPropertyPage = () => {
     features: [] as string[],
     houseRules: [] as string[],
     services: [] as string[],
+    safetyFeatures: [] as string[],
+    propertyType: '',
+    nearbyAttractions: [] as string[],
+    bedrooms: 1,
+    beds: 1,
+    baths: 1,
+    maxGuests: 1,
+    minStay: 1,
     images: [] as File[],
   });
   const [previewImages, setPreviewImages] = useState<string[]>([]); // Store image previews
@@ -241,9 +250,6 @@ const SLIDER_STEP = 10;
         </div>
 
 
-
-
-
    {/* Address, City, State, Country */}
    <p className="text-lg font-semibold text-center mb-4">Enter Property Address</p>
         <div className="mb-4">
@@ -285,7 +291,7 @@ const SLIDER_STEP = 10;
 
         {/* Coordinates Input */}
         <p className="text-lg font-semibold text-center mb-4">Enter Property Coordinates</p>
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 mb-6">
           <div className="flex-1">
             <label className="block mb-2">Latitude</label>
             <input
@@ -311,6 +317,7 @@ const SLIDER_STEP = 10;
         </div>
 
         {/* Check-in and Check-out Times */}
+        <p className="text-lg font-semibold text-center mb-4">Enter Check-In and Check-Out Times</p>
         <div className="mb-4">
           <label className="block mb-2">Check-In Time</label>
           <input
@@ -390,7 +397,126 @@ const SLIDER_STEP = 10;
           </div>
         </div>
 
-        {/* File Upload Section */}
+        {/* Safety Features Checkboxes */}
+        <div className="mb-4">
+  <label className="block mb-2">Safety Features</label>
+  <div className="flex flex-wrap">
+    {safetyFeaturesOptions.map((safetyFeature) => (
+      <label key={safetyFeature} className="mr-4">
+        <input
+          type="checkbox"
+          name={safetyFeature}
+          onChange={(e) => handleCheckboxChange(e, 'safetyFeatures')}
+        />
+        {safetyFeature}
+      </label>
+    ))}
+  </div>
+</div>
+
+{/* Property Type Dropdown */}
+<div className="mb-4">
+  <label className="block mb-2">Property Type</label>
+  <select
+    name="propertyType"
+    className="border p-2 w-full"
+    value={formData.propertyType}
+    onChange={handleInputChange}
+    required
+  >
+    <option value="">Select a Property Type</option>
+    {propertyTypeOptions.map((type) => (
+      <option key={type} value={type}>{type}</option>
+    ))}
+  </select>
+</div>
+
+{/* Nearby Attractions Checkboxes */}
+<div className="mb-4">
+  <label className="block mb-2">Nearby Attractions</label>
+  <div className="flex flex-wrap">
+    {nearbyAttractionsOptions.map((attraction) => (
+      <label key={attraction} className="mr-4">
+        <input
+          type="checkbox"
+          name={attraction}
+          onChange={(e) => handleCheckboxChange(e, 'nearbyAttractions')}
+        />
+        {attraction}
+      </label>
+    ))}
+  </div>
+</div>
+
+
+{/* Bedrooms, Beds and Baths */}
+<div className="mb-4 grid grid-cols-2 gap-4">
+
+  <div>
+    <label className="block mb-2">Bedrooms</label>
+    <input
+      type="number"
+      name="bedrooms"
+      value={formData.bedrooms}
+      onChange={handleInputChangeFixed}
+      className="border p-2 w-full"
+      required
+    />
+  </div>
+  <div>
+    <label className="block mb-2">Beds</label>
+    <input
+      type="number"
+      name="beds"
+      value={formData.beds}
+      onChange={handleInputChangeFixed}
+      className="border p-2 w-full"
+      required
+    />
+  </div>
+  <div>
+    <label className="block mb-2">Baths</label>
+    <input
+      type="number"
+      name="baths"
+      value={formData.baths}
+      onChange={handleInputChangeFixed}
+      className="border p-2 w-full"
+      required
+    />
+  </div>
+</div>
+
+
+{/* Max Guests and Min Stay Inputs */}
+<div className="mb-4 flex space-x-4">
+  <div>
+    <label className="block mb-2">Max Guests</label>
+    <input
+      type="number"
+      name="maxGuests"
+      min="1"
+      value={formData.maxGuests}
+      onChange={handleInputChange}
+      className="border p-2 w-full"
+      required
+    />
+  </div>
+  <div>
+    <label className="block mb-2">Minimum Stay (Nights)</label>
+    <input
+      type="number"
+      name="minStay"
+      min="1"
+      value={formData.minStay}
+      onChange={handleInputChange}
+      className="border p-2 w-full"
+      required
+    />
+  </div>
+</div>
+
+{/* Image Upload */}
         <p className="text-lg font-semibold text-center mb-4">Upload Property Images</p>
         <div
           onDragOver={handleDragOver}

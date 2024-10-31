@@ -104,3 +104,31 @@
 .modal-overlay {
     z-index: 1000; /* Lower than Show More Modal */
 }
+
+
+
+
+
+
+.review-modal-content {
+  width: 90%;
+  max-width: 500px; /* Set a max width to control size */
+  margin: auto;      /* Center modal horizontally */
+  padding: 2rem;     /* Add padding inside the modal */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.review-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.5); /* Dim background */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

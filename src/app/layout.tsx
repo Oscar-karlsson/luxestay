@@ -12,6 +12,8 @@ import './modalStyles.css'
 import BottomNavbar from "@/components/BottomNavbar";
 import TopNavbar from "@/components/TopNavbar";
 import Footer from "@/components/Footer";
+import ModalInitializer from "@/components/ModalInitializer";
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -38,6 +40,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className="bg-primary antialiased flex flex-col min-h-screen">
+        <ModalInitializer />
           <TopNavbar /> 
           <main className="flex-grow pb-20 md:pb-0">{children}</main>
           <Footer /> 

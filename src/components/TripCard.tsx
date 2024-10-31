@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ReviewModal from './ReviewModal';
 
 interface TripCardProps {
   bookingId: string;
@@ -12,6 +13,23 @@ interface TripCardProps {
 }
 
 const TripCard: React.FC<TripCardProps> = ({ bookingId, bookingDate, title, location, imageUrl, isCanceled = false, isCompleted = false, onCancel }) => {
+
+
+ // State to manage review modal visibility
+ const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+ // Handlers for opening and closing the review modal
+ const handleOpenReviewModal = () => setIsReviewModalOpen(true);
+ const handleCloseReviewModal = () => setIsReviewModalOpen(false);
+
+ // Handler to submit the review (this will eventually send data to Firestore or similar)
+ const handleSubmitReview = (rating: number, comment: string) => {
+   console.log('Review Submitted:', { rating, comment });
+   handleCloseReviewModal();
+ };
+
+
+
   return (
     <div className="bg-white shadow-lg rounded-lg p-4 mb-4 max-w-md mx-auto lg:max-w-lg xl:max-w-xl">
 
@@ -39,7 +57,8 @@ const TripCard: React.FC<TripCardProps> = ({ bookingId, bookingDate, title, loca
 {/* Button layout for completed and canceled trips */}
 {(isCompleted || isCanceled) && (
         <div className="mt-4 flex justify-between space-x-4">
-          <button 
+         <button 
+            onClick={handleOpenReviewModal} // Open the modal on click
             className={`py-2 px-4 rounded-lg flex-1 font-semi-bold text-b1-mobile lg:text-b1-desktop ${
               isCanceled ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-secondaryButton text-secondaryButtonText'
             }`}
@@ -72,6 +91,12 @@ const TripCard: React.FC<TripCardProps> = ({ bookingId, bookingDate, title, loca
         </div>
       )}
 
+ {/* Review Modal */}
+ <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={handleCloseReviewModal}
+        onSubmit={handleSubmitReview}
+      />
 
     </div>
   );

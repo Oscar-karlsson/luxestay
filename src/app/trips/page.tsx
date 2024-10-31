@@ -5,6 +5,7 @@ import NoTripsCard from '@/components/NoTripsCard';
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from  '@/utils/firebase';
 import { useUser } from '@clerk/nextjs';
+import { cancelBooking } from '@/services/bookingService';
 
 
 interface TripData {
@@ -61,6 +62,19 @@ const TripsPage: React.FC = () => {
     fetchTrips();  // Call fetchTrips
   }, [user]);  // Rerun if user changes
 
+
+
+  const handleCancel = async (bookingId: string) => {
+    await cancelBooking(bookingId); // Calls Firestore function to set status to canceled
+    setTrips((prevTrips) =>
+      prevTrips.map((trip) =>
+        trip.bookingId === bookingId
+          ? { ...trip, isCanceled: true, isUpcoming: false, isCompleted: true } // Update isUpcoming and isCompleted
+          : trip
+      )
+    );
+  };
+
   const filteredTrips = trips.filter(trip => {
     if (activeTab === 'upcoming') {
       return trip.isUpcoming;
@@ -100,6 +114,7 @@ const TripsPage: React.FC = () => {
           imageUrl={trip.imageUrl}
           isCanceled={trip.isCanceled}
           isCompleted={trip.isCompleted}
+          onCancel={() => handleCancel(trip.bookingId)}
         />
         ))
       ) : (

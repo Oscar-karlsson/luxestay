@@ -126,7 +126,7 @@ export const confirmBooking = async (bookingId: string): Promise<void> => {
 // Cancel Booking
 export const cancelBooking = async (bookingId: string): Promise<void> => {
   const bookingRef = doc(db, "bookings", bookingId);
-  await updateDoc(bookingRef, { status: "cancelled" });
+  await updateDoc(bookingRef, { status: "canceled" });
 };
 
 export { checkDateAvailability };

@@ -8,9 +8,10 @@ interface TripCardProps {
   imageUrl: string;
   isCanceled?: boolean;  // Handles canceled trips
   isCompleted?: boolean; // Handles completed trips
+  onCancel?: () => void;
 }
 
-const TripCard: React.FC<TripCardProps> = ({ bookingId, bookingDate, title, location, imageUrl, isCanceled = false, isCompleted = false }) => {
+const TripCard: React.FC<TripCardProps> = ({ bookingId, bookingDate, title, location, imageUrl, isCanceled = false, isCompleted = false, onCancel }) => {
   return (
     <div className="bg-white shadow-lg rounded-lg p-4 mb-4 max-w-md mx-auto lg:max-w-lg xl:max-w-xl">
 
@@ -58,10 +59,12 @@ const TripCard: React.FC<TripCardProps> = ({ bookingId, bookingDate, title, loca
       {/* Button layout for upcoming trips */}
       {!isCompleted && !isCanceled && (
         <div className="mt-4 flex justify-between space-x-4">
-          <button 
-            className="bg-gray-200 text-black font-semibold py-2 px-4 rounded-lg flex-1">
-            Cancel
-          </button>
+   <button 
+      className="bg-gray-200 text-black font-semibold py-2 px-4 rounded-lg flex-1"
+      onClick={onCancel}  // Call onCancel function
+    >
+      Cancel
+    </button>
           <button 
             className="bg-black text-white font-semibold py-2 px-4 rounded-lg flex-1">
             View Details

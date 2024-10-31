@@ -1,46 +1,67 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TripCard from '@/components/TripCard';
 import NoTripsCard from '@/components/NoTripsCard';
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from  '@/utils/firebase';
+import { useUser } from '@clerk/nextjs';
 
-const tripsData = [
-  {
-    bookingId: '453453',
-    bookingDate: 'October 12 - October 22',
-    title: 'Buccara Villa El Nido',
-    location: 'Marbella, Spain',
-    imageUrl: 'https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/3796f37b-1957-4df7-881e-7c3e10b52794.jpeg?im_w=1200', 
-    isUpcoming: true,    // Upcoming trip
-    isCompleted: false,
-    isCanceled: false,
-  },
-  {
-    bookingId: '789789',
-    bookingDate: 'September 10 - September 20',
-    title: 'Casa Blanca',
-    location: 'Ibiza, Spain',
-    imageUrl: 'https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/3796f37b-1957-4df7-881e-7c3e10b52794.jpeg?im_w=1200',
-    isUpcoming: false,
-    isCompleted: true,    // Completed trip
-    isCanceled: false,
-  },
-  {
-    bookingId: '123123',
-    bookingDate: 'August 01 - August 10',
-    title: 'Ocean Breeze Villa',
-    location: 'Malaga, Spain',
-    imageUrl: 'https://a0.muscache.com/im/pictures/miso/Hosting-889026536061465920/original/3796f37b-1957-4df7-881e-7c3e10b52794.jpeg?im_w=1200',
-    isUpcoming: false,
-    isCompleted: false,
-    isCanceled: true,     // Canceled trip
-  },
-  // Add more trips as needed...
-];
+
+interface TripData {
+  bookingId: string;
+  bookingDate: string;
+  title: string;
+  location: string;
+  imageUrl: string;
+  isUpcoming: boolean;
+  isCompleted: boolean;
+  isCanceled: boolean;
+}
 
 const TripsPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'done'>('upcoming');
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'done'>('upcoming'); // Control current tab
+  const [trips, setTrips] = useState<TripData[]>([]); // Store trips
+  const [loading, setLoading] = useState<boolean>(true); // Loading status
+  const { user } = useUser(); // Logged-in user
 
-  const filteredTrips = tripsData.filter(trip => {
+  useEffect(() => {
+    const fetchTrips = async () => {
+      if (!user) return;  // Skip if no user is logged in
+
+      setLoading(true);  // Start loading
+
+      const tripsQuery = query(
+        collection(db, "bookings"),
+        where("userId", "==", user.id)  // Only fetch trips for this user
+      );
+
+      const tripDocs = await getDocs(tripsQuery);  // Fetch trip documents
+
+      const tripData = tripDocs.docs.map((doc) => {
+        const data = doc.data();
+        const startDate = data.startDate.toDate();
+        const endDate = data.endDate.toDate();
+        
+        return {
+          bookingId: doc.id,
+          bookingDate: `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`,
+          title: data.propertyTitle,
+          location: data.location,
+          imageUrl: data.imageUrl,
+          isUpcoming: startDate > new Date() && data.status !== "canceled",
+          isCompleted: endDate < new Date() && data.status !== "canceled",
+          isCanceled: data.status === "canceled"
+        };
+      });
+
+      setTrips(tripData);  // Update trips
+      setLoading(false);   // End loading
+    };
+
+    fetchTrips();  // Call fetchTrips
+  }, [user]);  // Rerun if user changes
+
+  const filteredTrips = trips.filter(trip => {
     if (activeTab === 'upcoming') {
       return trip.isUpcoming;
     } else if (activeTab === 'done') {
@@ -70,16 +91,16 @@ const TripsPage: React.FC = () => {
       {/* Trip Cards */}
       {filteredTrips.length > 0 ? (
         filteredTrips.map(trip => (
-<TripCard
-  key={trip.bookingId}
-  bookingId={trip.bookingId}
-  bookingDate={trip.bookingDate}
-  title={trip.title}
-  location={trip.location}
-  imageUrl={trip.imageUrl}
-  isCanceled={trip.isCanceled}   
-  isCompleted={trip.isCompleted} 
-/>
+          <TripCard
+          key={trip.bookingId}
+          bookingId={trip.bookingId}
+          bookingDate={trip.bookingDate}
+          title={trip.title}
+          location={trip.location}
+          imageUrl={trip.imageUrl}
+          isCanceled={trip.isCanceled}
+          isCompleted={trip.isCompleted}
+        />
         ))
       ) : (
         <NoTripsCard />

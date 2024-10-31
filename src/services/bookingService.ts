@@ -53,7 +53,7 @@ const checkDateAvailability = async (propertyId: string, startDate: Date, endDat
   const bookingsQuery = query(
     collection(db, "bookings"),
     where("propertyId", "==", propertyId),
-    where("status", "==", "confirmed")
+    where("status", "in", ["pending", "confirmed"])  // Only exclude "canceled" bookings
   );
 
   const bookingSnapshots = await getDocs(bookingsQuery);
@@ -99,7 +99,7 @@ export const createBooking = async ({
         propertyId,
         startDate,
         endDate,
-        status: "pending",
+        status: "confirmed",
         createdAt: new Date(),
         location,        
         pricePerNight,   

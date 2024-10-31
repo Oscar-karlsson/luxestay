@@ -12,6 +12,7 @@ const PaymentPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+
   // Retrieve data from query parameters
   const propertyTitle = searchParams.get('title') || 'Property Name';
   const propertyLocation = searchParams.get('location') || 'Location';
@@ -28,6 +29,17 @@ const PaymentPage: React.FC = () => {
   const imageUrl = searchParams.get('imageUrl') || '/default-image.jpg';
   const guests = parseInt(searchParams.get('guests') || '1', 10);
 
+  // Define propertyId, startDate, and endDate after checkIn and checkOut
+  const propertyId = searchParams.get('propertyId') || '';
+  const startDate = new Date(checkIn);
+  const endDate = new Date(checkOut);
+  
+  
+  if (!propertyId) {
+    console.error("Error: Property ID is missing or invalid.");
+    console.log("Invalid property information. Please try again.");
+  }
+
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   // Fetch client secret from backend API on mount
@@ -42,6 +54,14 @@ const PaymentPage: React.FC = () => {
       .then((res) => res.json())
       .then((data) => setClientSecret(data.clientSecret));
   }, [totalPrice]);
+
+
+
+   // Define handlePaymentSuccess function with bookingId parameter
+   const handlePaymentSuccess = (bookingId: string) => {
+    console.log('Payment confirmed');
+    router.push(`/book/${propertyId}/confirmation?bookingId=${bookingId}`);
+  };
 
   return (
     <PaymentLayout>
@@ -93,17 +113,23 @@ const PaymentPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Payment Method */}
-      {clientSecret && (
-  <CardForm
-    clientSecret={clientSecret}
-    handlePaymentSuccess={() => {
-      alert('Payment confirmed');
-      router.push('/confirmation'); // Redirect to confirmation page
-    }}
-  />
-)}
-    </div>
+    {/* Payment Method */}
+    {clientSecret && (
+     <CardForm
+     clientSecret={clientSecret}
+     handlePaymentSuccess={handlePaymentSuccess} 
+     propertyId={propertyId}
+     startDate={startDate}
+     endDate={endDate}
+     propertyTitle={propertyTitle}
+     imageUrl={imageUrl}
+     location={propertyLocation}
+     pricePerNight={price}
+     cleaningFee={cleaningFee}
+     serviceFee={serviceFee}
+   />
+        )}
+      </div>
     </PaymentLayout>
   );
 };

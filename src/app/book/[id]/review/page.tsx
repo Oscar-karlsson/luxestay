@@ -30,7 +30,7 @@ const BookingReviewPage = () => {
   const imageUrl = searchParams.get('imageUrl') || '/default-image.jpg';
 
   const cleaningFee = 200;
-  const serviceFee = 0;
+  const serviceFee = 300;
 
   const calculateTotalPrice = () => {
     const nights = (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24);
@@ -38,7 +38,7 @@ const BookingReviewPage = () => {
   };
 
   const handleProceedToPayment = () => {
-    router.push(`/book/${id}/payment?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&price=${price}&title=${propertyTitle}&location=${propertyLocation}&imageUrl=${encodeURIComponent(imageUrl)}&cleaningFee=${cleaningFee}&serviceFee=${serviceFee}&totalPrice=${calculateTotalPrice()}`);
+    router.push(`/book/${id}/payment?propertyId=${id}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&price=${price}&title=${propertyTitle}&location=${propertyLocation}&imageUrl=${encodeURIComponent(imageUrl)}&cleaningFee=${cleaningFee}&serviceFee=${serviceFee}&totalPrice=${calculateTotalPrice()}`);
   };
 
   const content = (

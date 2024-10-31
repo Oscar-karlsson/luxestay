@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-
+import { addReview } from '@/services/reviewService';
 
 
 interface ReviewModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (rating: number, comment: string) => void;
-}
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (rating: number, comment: string) => void;
+    userId: string;
+    propertyId: string;
+  }
 
-const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmit }) => {
+  const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmit, userId, propertyId }) => {
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>('');
 
@@ -20,12 +22,30 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmit }) 
     }
   }, []);
 
-  const handleSubmit = () => {
-    onSubmit(rating, comment);
-    setRating(0); // Reset rating after submission
-    setComment(''); // Reset comment after submission
-    onClose(); // Close the modal
-  };
+  const handleSubmit = async () => {
+    // Ensure rating is within 1-5 before proceeding
+    if (rating < 1 || rating > 5) {
+        console.log("Please select a rating between 1 and 5.");
+        return;
+    }
+    
+    const reviewId = await addReview({
+        userId,         
+        propertyId,     
+        rating,
+        comment,
+    });
+
+    if (reviewId) {
+      console.log('Review submitted successfully:', reviewId);
+    } else {
+      console.error('Failed to submit review');
+    }
+  
+    setRating(0);
+    setComment('');
+    onClose();
+};
 
   return (
     <Modal

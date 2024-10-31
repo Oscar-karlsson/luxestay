@@ -14,6 +14,8 @@ interface TripData {
   title: string;
   location: string;
   imageUrl: string;
+  userId: string;
+  propertyId: string;
   isUpcoming: boolean;
   isCompleted: boolean;
   isCanceled: boolean;
@@ -43,12 +45,15 @@ const TripsPage: React.FC = () => {
         const startDate = data.startDate.toDate();
         const endDate = data.endDate.toDate();
         
+        
         return {
           bookingId: doc.id,
           bookingDate: `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`,
           title: data.propertyTitle,
           location: data.location,
           imageUrl: data.imageUrl,
+          userId: data.userId,
+          propertyId: data.propertyId,  
           isUpcoming: startDate > new Date() && data.status !== "canceled",
           isCompleted: endDate < new Date() && data.status !== "canceled",
           isCanceled: data.status === "canceled"
@@ -114,6 +119,8 @@ const TripsPage: React.FC = () => {
           imageUrl={trip.imageUrl}
           isCanceled={trip.isCanceled}
           isCompleted={trip.isCompleted}
+          userId={trip.userId}  
+          propertyId={trip.propertyId}
           onCancel={() => handleCancel(trip.bookingId)}
         />
         ))

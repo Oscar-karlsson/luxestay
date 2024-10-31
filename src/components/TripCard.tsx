@@ -10,9 +10,22 @@ interface TripCardProps {
   isCanceled?: boolean;  // Handles canceled trips
   isCompleted?: boolean; // Handles completed trips
   onCancel?: () => void;
+  userId: string;
+  propertyId: string;
 }
 
-const TripCard: React.FC<TripCardProps> = ({ bookingId, bookingDate, title, location, imageUrl, isCanceled = false, isCompleted = false, onCancel }) => {
+const TripCard: React.FC<TripCardProps> = ({
+  bookingId,
+  bookingDate,
+  title,
+  location,
+  imageUrl,
+  isCanceled = false,
+  isCompleted = false,
+  onCancel,
+  userId,
+  propertyId,
+}) => {
 
 
  // State to manage review modal visibility
@@ -22,11 +35,10 @@ const TripCard: React.FC<TripCardProps> = ({ bookingId, bookingDate, title, loca
  const handleOpenReviewModal = () => setIsReviewModalOpen(true);
  const handleCloseReviewModal = () => setIsReviewModalOpen(false);
 
- // Handler to submit the review (this will eventually send data to Firestore or similar)
  const handleSubmitReview = (rating: number, comment: string) => {
-   console.log('Review Submitted:', { rating, comment });
-   handleCloseReviewModal();
- };
+    console.log('Review Submitted:', { rating, comment, userId, propertyId });
+    handleCloseReviewModal(); // Close modal after submission
+  };
 
 
 
@@ -96,8 +108,9 @@ const TripCard: React.FC<TripCardProps> = ({ bookingId, bookingDate, title, loca
         isOpen={isReviewModalOpen}
         onClose={handleCloseReviewModal}
         onSubmit={handleSubmitReview}
+        userId={userId}
+        propertyId={propertyId}
       />
-
     </div>
   );
 };

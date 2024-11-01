@@ -104,9 +104,17 @@ const userId = user ? user.id : '';
     
                 if (docSnap.exists()) {
                     const propertyData = { id: docSnap.id, ...docSnap.data() };
-                    setProperty(propertyData);
-    
-                    // Fetch host data via API route
+                    
+                    // Set property data
+                    setProperty({
+                        ...propertyData,
+                        guests: propertyData.guests || 10,  // Default guests
+                        bedrooms: propertyData.bedrooms || '0',
+                        beds: propertyData.beds || '0',
+                        baths: propertyData.baths || '0',
+                    });
+                    
+                    // Fetch host data if userId exists
                     if (propertyData.userId) {
                         const response = await fetch(`/api/fetchHost?userId=${propertyData.userId}`);
                         const hostData = await response.json();
@@ -133,10 +141,22 @@ const userId = user ? user.id : '';
     
                 const reviewsData = await getReviewsForProperty(property.id);
     
-                // Filter out reviews that don't have a comment
+                // Filter out reviews that don't have a comment, only for displaying purposes
                 const reviewsWithComments = reviewsData.filter((review) => review.comment && review.comment.trim() !== "");
     
                 setReviews(reviewsWithComments);
+    
+                // Calculate average rating and total count using all reviews
+                const totalRatings = reviewsData.length;
+                const averageRating = totalRatings > 0
+                    ? reviewsData.reduce((sum, review) => sum + review.rating, 0) / totalRatings
+                    : 0;
+    
+                setProperty((prev) => ({
+                    ...prev,
+                    averageRating: averageRating.toFixed(1),
+                    totalRatings
+                }));
             } catch (error) {
                 console.error("Error fetching reviews:", error);
             }
@@ -202,15 +222,31 @@ const userId = user ? user.id : '';
                 {property && <h1 className="text-2xl font-bold md:hidden">{property.title}</h1>}
 
                 {property && (
-    <div className="flex items-center space-x-2">
-        <span>{`${property.city}, ${property.country}`}</span>
-        <div className="flex items-center">
-            <AiFillStar className="text-yellow-500" />
-            <span className="ml-1 text-gray-600">
-                {typeof property.rating === 'number' ? property.rating.toFixed(1) : '0.00'}
-            </span>
-        </div>
-    </div>
+  <div className="flex flex-col space-y-1">
+  {/* Location */}
+  <span className="text-gray-600 ">{`${property.city}, ${property.country}`}</span>
+
+  {/* Row with Guests, Bedrooms, Beds, and Bathrooms */}
+  <div className="text-sm text-gray-500">
+      {`${property.guests || 10} guests • ${property.bedrooms} bedrooms • ${property.beds} beds • ${property.baths} bathrooms`}
+  </div>
+
+  {/* Rating Section with Total Ratings or No Reviews */}
+  <div className="flex items-center space-x-1 text-gray-600 mt-1">
+      {property.totalRatings > 0 ? (
+          <>
+              <AiFillStar className="text-yellow-500" />
+              <span className="font-semibold">{property.averageRating}</span> 
+              <span className="text-sm"> ({property.totalRatings})</span>
+          </>
+      ) : (
+          <>
+              <AiFillStar className="text-gray-400" />
+              <span className="italic text-sm">No reviews yet</span>
+          </>
+      )}
+  </div>
+</div>
 )}
 
                     <p className="text-gray-700 mt-2">

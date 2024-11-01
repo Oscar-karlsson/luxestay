@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '@/utils/formatPrice';
 import { useUser } from '@clerk/clerk-react';
+import RatingDisplay from './RatingDisplay';
 
 interface Property {
   id: string;
@@ -21,11 +22,16 @@ interface Property {
 
 interface FavoriteCardProps {
   property: Property;
+  averageRating: number;
+  totalReviews: number;
 }
 
-const FavoriteCard: React.FC<FavoriteCardProps> = ({ property }) => {
+const FavoriteCard: React.FC<FavoriteCardProps> = ({ property, averageRating, totalReviews }) => {
   const { user } = useUser();
   const userId = user ? user.id : '';
+
+
+  
 
   return (
     <div className="relative">
@@ -59,12 +65,11 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ property }) => {
           {/* Top Section for smaller screens: Rating and Title */}
           <div className="lg:hidden flex justify-between items-center">
             {/* Rating on the left */}
-            <span className="text-gray-600 flex items-center">
-              <AiFillStar className="text-yellow-500" />
-              <span className="ml-1">
-                {property.rating ? property.rating.toFixed(1) : '0.00'} ({property.reviews?.length || 0})
-              </span>
-            </span>
+            {totalReviews > 0 && (
+    <span className="text-gray-600 flex items-center">
+        <RatingDisplay averageRating={averageRating} totalReviews={totalReviews} />
+    </span>
+)}
           </div>
 
           {/* Title stays under the rating on smaller screens */}
@@ -85,12 +90,11 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ property }) => {
           {/* For larger screens: Title and rating stay on the same row */}
           <div className="hidden lg:flex justify-between items-center">
             <h2 className="text-lg font-semibold">{property.title}</h2>
-            <span className="text-gray-600 flex items-center">
-              <AiFillStar className="text-yellow-500" />
-              <span className="ml-1">
-                {property.rating ? property.rating.toFixed(1) : '0.00'} ({property.reviews?.length || 0})
-              </span>
-            </span>
+            {totalReviews > 0 && (
+    <span className="text-gray-600 flex items-center">
+        <RatingDisplay averageRating={averageRating} totalReviews={totalReviews} />
+    </span>
+)}
           </div>
 
           {/* Location for larger screens */}

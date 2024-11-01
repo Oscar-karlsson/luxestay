@@ -3,6 +3,7 @@ import { fetchFavoriteProperties } from '@/services/favoritesService';
 import FavoriteCard from '@/components/FavoriteCard';
 import { useUser } from '@clerk/clerk-react';
 import React, { useEffect, useState } from 'react';
+import { getReviewsForProperty } from '@/services/reviewService';
 
 
 
@@ -31,20 +32,38 @@ const FavoritesPage = () => {
 
 // Fetch favorite properties from Firestore for the current user
 useEffect(() => {
-  const getFavorites = async () => {
-    if (!userId) return;  // Ensure userId is available before fetching
+  const fetchFavoritesWithReviews = async () => {
+    if (!userId) return;
     setLoading(true);
+
     try {
-      const favorites = await fetchFavoriteProperties(userId);  // Fetch favorites using the userId
-      setFavoriteProperties(favorites);
+      const favorites = await fetchFavoriteProperties(userId);
+
+      const favoritesWithRatings = await Promise.all(
+        favorites.map(async (property) => {
+          const reviews = await getReviewsForProperty(property.id);
+          const totalReviews = reviews.length;
+          const averageRating = totalReviews > 0
+            ? reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews
+            : 0;
+
+          return {
+            ...property,
+            averageRating,
+            totalReviews,
+          };
+        })
+      );
+
+      setFavoriteProperties(favoritesWithRatings);
     } catch (error) {
-      console.error('Error fetching favorite properties:', error);
+      console.error('Error fetching favorite properties with reviews:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  getFavorites();
+  fetchFavoritesWithReviews();
 }, [userId]);
 
 if (loading) {
@@ -59,7 +78,12 @@ return (
     {favoriteProperties.length > 0 ? (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {favoriteProperties.map((property) => (
-         <FavoriteCard property={property} userId={userId} />
+        <FavoriteCard 
+        property={property} 
+        userId={userId} 
+        averageRating={property.averageRating} 
+        totalReviews={property.totalReviews} 
+      />
         ))}
       </div>
     ) : (

@@ -8,10 +8,11 @@ interface ReviewCardProps {
     review: string;
     date: string;
     ranking?: number;
+    profileImageUrl?: string;
     onShowMore: (review: string) => void; // Add this prop
   }
   
-  const ReviewCard: React.FC<ReviewCardProps> = ({ name, review, date, ranking, onShowMore }) => {
+  const ReviewCard: React.FC<ReviewCardProps> = ({ name, review, date, ranking, profileImageUrl, onShowMore }) => {
     const maxLength = 100; // Maximum number of characters before truncating
   
     // Show truncated review if it's longer than maxLength
@@ -20,14 +21,16 @@ interface ReviewCardProps {
     return (
       <div className="review-card bg-gray-100 p-4 rounded-lg shadow-md space-y-3">
         <div className="flex items-center space-x-4">
-          {/* Placeholder profile picture */}
-          <Image
-            src="/profile.png"
-            alt={`${name}'s profile picture`}
-            width={50}
-            height={50}
-            className="rounded-full"
-          />
+          {/* Display user profile picture */}
+          <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
+  <Image
+    src={profileImageUrl || '/profile.png'}
+    alt={`${name}'s profile picture`}
+    width={48}
+    height={48}
+    className="object-cover w-full h-full"
+  />
+</div>
           <div>
             <p className="font-semibold">{name}</p>
             <p className="text-sm text-gray-500">{timeAgo(date)}</p>

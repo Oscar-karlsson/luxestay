@@ -178,13 +178,13 @@ const userId = user ? user.id : '';
                 </button>
                 {property?.imageUrls && property.imageUrls.length > 0 ? (
     <Image
-    src={property.imageUrls[0]}  // Access the first image in the array
-    alt={property.title || 'Property Image'} 
-    width={1200}  // Set the width
-    height={800} // Set the height
-    layout="responsive"  
-    className="w-full h-auto object-cover max-h-96" 
-/>
+    src={property.imageUrls[0]}
+    alt={property.title || 'Property Image'}
+    width={1200}  // Set the width as before
+    height={800}  // Set the height as before
+    priority // Adds priority for better performance on images above the fold
+    className="w-full h-auto object-cover max-h-96"
+  />
 ) : (
     <div className="w-full h-48 bg-gray-300 flex items-center justify-center">
         No Image Available
@@ -229,14 +229,18 @@ const userId = user ? user.id : '';
                     {/* Divider */}
                     <hr className="block md:hidden my-4 border-t border-divider" />
                     {host && (
-    <p className="text-sm text-gray-500 flex items-center">
-        <img
-            src={host.profileImageUrl || "/default-profile.png"}
-            alt="Host Profile"
-            className="w-10 h-10 rounded-full mr-2"
-        />
-        {`Hosted by ${host.firstName || ''} ${host.lastName || ''}`}
-    </p>
+  <div className="text-sm text-gray-500 flex items-center">
+    <div className="rounded-full overflow-hidden w-10 h-10 mr-2">
+      <Image
+        src={host.profileImageUrl || "/default-profile.png"}
+        alt="Host Profile"
+        width={40}
+        height={40}
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+    </div>
+    <span>{`Hosted by ${host.firstName || ''} ${host.lastName || ''}`}</span>
+  </div>
 )}
 
                     {/* Divider */}
@@ -340,10 +344,11 @@ const userId = user ? user.id : '';
       {reviews.map((review, index) => (
           <div className="embla__slide" key={index}>
             <ReviewCard
-              name={review.name}
+             name={review.name}
               review={review.comment} 
               date={review.timestamp.toDate()}
               ranking={review.rating}
+              profileImageUrl={review.profileImageUrl}
               onShowMore={(fullReview) => {
                 setModalContent(fullReview); // Set the content
                 setIsShowMoreModalOpen(true); // Open the modal

@@ -47,7 +47,7 @@ const fetchUserProfile = async (userId: string) => {
     const user = await clerkClient.users.getUser(userId);
     return {
       name: `${user.firstName} ${user.lastName}`,
-      profileImageUrl: user.profileImageUrl || "/default-profile.png",
+      profileImageUrl: user.imageUrl || "/default-profile.png",
     };
   } catch (error) {
     console.error("Error fetching user profile:", error);
@@ -67,13 +67,16 @@ export const getReviewsForProperty = async (propertyId: string) => {
     const reviews = await Promise.all(
       querySnapshot.docs.map(async (doc) => {
         const reviewData = doc.data();
-        const user = await fetchUserProfile(reviewData.userId);
+
+        // Fetch user info via the custom API endpoint
+        const userResponse = await fetch(`/api/fetchHost?userId=${reviewData.userId}`);
+        const userData = await userResponse.json();
 
         return {
           ...reviewData,
-          name: user.name,
-          profileImageUrl: user.profileImageUrl,
-          id: doc.id, // Add the review document ID
+          name: `${userData.firstName} ${userData.lastName}`,
+          profileImageUrl: userData.profileImageUrl,
+          id: doc.id, // Add the review document ID if needed
         };
       })
     );

@@ -15,6 +15,7 @@ import EmblaCarouselReact from 'embla-carousel-react';
 import PropertyMap from '@/components/PropertyMap';
 import Image from 'next/image';
 import { useUser } from '@clerk/clerk-react';
+import { getReviewsForProperty } from '@/services/reviewService';
 
 type ShowMoreSection = 'description' | 'features' | 'houseRules' | 'services';
 
@@ -29,6 +30,7 @@ const PropertyDetail = () => {
     const [selectedCheckOut, setSelectedCheckOut] = useState<string | null>(null);
     const [selectedGuests, setSelectedGuests] = useState<number>(1);
     const [host, setHost] = useState<any>(null);
+    const [reviews, setReviews] = useState([]);
     const [emblaRef, emblaApi] = EmblaCarouselReact({ loop: false, slidesToScroll: 1 });
     const { user } = useUser();
 const userId = user ? user.id : '';
@@ -121,6 +123,27 @@ const userId = user ? user.id : '';
     
         fetchProperty();
     }, [id, router]);
+
+
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                if (!property?.id) return;
+    
+                const reviewsData = await getReviewsForProperty(property.id);
+    
+                // Filter out reviews that don't have a comment
+                const reviewsWithComments = reviewsData.filter((review) => review.comment && review.comment.trim() !== "");
+    
+                setReviews(reviewsWithComments);
+            } catch (error) {
+                console.error("Error fetching reviews:", error);
+            }
+        };
+    
+        fetchReviews();
+    }, [property?.id]);
 
     
 
@@ -314,13 +337,13 @@ const userId = user ? user.id : '';
   <div className="overflow-hidden w-full max-w-5xl mx-auto"> {/* Ensures the slider is within the container */}
     <div className="embla review-slider" ref={emblaRef}>
       <div className="embla__container">
-        {property?.details?.reviews && property.details.reviews.map((review, index) => (
+      {reviews.map((review, index) => (
           <div className="embla__slide" key={index}>
             <ReviewCard
               name={review.name}
-              review={review.review}
-              date={review.date}
-              ranking={review.ranking}
+              review={review.comment} 
+              date={review.timestamp.toDate()}
+              ranking={review.rating}
               onShowMore={(fullReview) => {
                 setModalContent(fullReview); // Set the content
                 setIsShowMoreModalOpen(true); // Open the modal

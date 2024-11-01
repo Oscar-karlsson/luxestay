@@ -1,5 +1,6 @@
 import { db } from "../utils/firebase";
-import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where, Timestamp } from "firebase/firestore";
+import { clerkClient } from "@clerk/clerk-sdk-node";
 
 type ReviewParams = {
   userId: string;
@@ -35,5 +36,51 @@ export const addReview = async ({
   } catch (error) {
     console.error("Error adding review:", error);
     return null;
+  }
+};
+
+
+
+// Function to fetch user details from Clerk
+const fetchUserProfile = async (userId: string) => {
+  try {
+    const user = await clerkClient.users.getUser(userId);
+    return {
+      name: `${user.firstName} ${user.lastName}`,
+      profileImageUrl: user.profileImageUrl || "/default-profile.png",
+    };
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    return { name: "Unknown User", profileImageUrl: "/default-profile.png" };
+  }
+};
+
+// Function to fetch reviews for a specific property with user details
+export const getReviewsForProperty = async (propertyId: string) => {
+  try {
+    const reviewsQuery = query(
+      collection(db, "reviews"),
+      where("propertyId", "==", propertyId)
+    );
+    const querySnapshot = await getDocs(reviewsQuery);
+
+    const reviews = await Promise.all(
+      querySnapshot.docs.map(async (doc) => {
+        const reviewData = doc.data();
+        const user = await fetchUserProfile(reviewData.userId);
+
+        return {
+          ...reviewData,
+          name: user.name,
+          profileImageUrl: user.profileImageUrl,
+          id: doc.id, // Add the review document ID
+        };
+      })
+    );
+
+    return reviews;
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return [];
   }
 };

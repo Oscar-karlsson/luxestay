@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReviewModal from './ReviewModal';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '@/utils/firebase';
 
 interface TripCardProps {
   bookingId: string;
@@ -36,10 +38,30 @@ const TripCard: React.FC<TripCardProps> = ({
  const handleCloseReviewModal = () => setIsReviewModalOpen(false);
 
  const handleSubmitReview = (rating: number, comment: string) => {
-    console.log('Review Submitted:', { rating, comment, userId, propertyId });
-    handleCloseReviewModal(); // Close modal after submission
-  };
+  console.log('Review Submitted:', { rating, comment, userId, propertyId });
+  setHasReviewed(true); // Mark as reviewed after submission
+  handleCloseReviewModal();
+};
+  const [hasReviewed, setHasReviewed] = useState(false);
 
+  useEffect(() => {
+    const checkIfReviewed = async () => {
+      try {
+        const reviewsRef = collection(db, "reviews");
+        const q = query(
+          reviewsRef,
+          where("userId", "==", userId),
+          where("propertyId", "==", propertyId)
+        );
+        const querySnapshot = await getDocs(q);
+        setHasReviewed(!querySnapshot.empty); // If there are results, the user has reviewed
+      } catch (error) {
+        console.error("Error checking review status:", error);
+      }
+    };
+  
+    checkIfReviewed();
+  }, [userId, propertyId]); // Dependency array
 
 
   return (
@@ -69,15 +91,25 @@ const TripCard: React.FC<TripCardProps> = ({
 {/* Button layout for completed and canceled trips */}
 {(isCompleted || isCanceled) && (
         <div className="mt-4 flex justify-between space-x-4">
-         <button 
-            onClick={handleOpenReviewModal} // Open the modal on click
-            className={`py-2 px-4 rounded-lg flex-1 font-semi-bold text-b1-mobile lg:text-b1-desktop ${
-              isCanceled ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-secondaryButton text-secondaryButtonText'
-            }`}
-            disabled={isCanceled}  // Disable if canceled
-          >
-            Write a Review
-          </button>
+      {hasReviewed ? (
+    <button
+      className="bg-gray-200 text-gray-400 py-2 px-4 rounded-lg flex-1 font-semi-bold text-b1-mobile lg:text-b1-desktop cursor-not-allowed"
+      disabled
+    >
+      Review Submitted
+    </button>
+  ) : (
+    <button
+      onClick={handleOpenReviewModal}
+      className={`py-2 px-4 rounded-lg flex-1 font-semi-bold text-b1-mobile lg:text-b1-desktop ${
+        isCanceled ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-secondaryButton text-secondaryButtonText'
+      }`}
+      disabled={isCanceled} // Disable if canceled
+    >
+      Write a Review
+    </button>
+  )}
+
           <button 
             className="bg-primaryButton text-primaryButtonText text-b1-mobile lg:text-b1-desktop font-semi-bold py-2 px-4 rounded-lg flex-1"
           >

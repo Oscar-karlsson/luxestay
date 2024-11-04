@@ -4,6 +4,7 @@ import FavoriteCard from '@/components/FavoriteCard';
 import { useUser } from '@clerk/clerk-react';
 import React, { useEffect, useState } from 'react';
 import { getReviewsForProperty } from '@/services/reviewService';
+import { calculateRatingData } from '@/utils/ratingUtils';
 
 
 
@@ -13,18 +14,20 @@ type Property = {
   title: string;
   city: string;
   country: string;
-  price: number;
+  price: string;
   rating: number;
   userID: string;
   isFavorite: boolean;
-  images: string[];
+  imageUrls: string[];
   reviews?: { name: string; review: string; date: string; ranking: number }[];
+  averageRating?: number; 
+  totalReviews?: number;
 };
 
 
 const FavoritesPage = () => {
   const { user } = useUser();  // Retrieve the logged-in user
-  const userId = user ? user.id : null;  // Get the user ID directly
+  const userId = user ? user.id : '';   // Get the user ID directly
   const [favoriteProperties, setFavoriteProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,20 +35,17 @@ const FavoritesPage = () => {
 
 // Fetch favorite properties from Firestore for the current user
 useEffect(() => {
-  const fetchFavoritesWithReviews = async () => {
+  const fetchFavoritesWithRatings = async () => {
     if (!userId) return;
     setLoading(true);
 
     try {
-      const favorites = await fetchFavoriteProperties(userId);
+      const favorites = await fetchFavoriteProperties(userId); // Ensure favorites is fetched here
 
       const favoritesWithRatings = await Promise.all(
         favorites.map(async (property) => {
           const reviews = await getReviewsForProperty(property.id);
-          const totalReviews = reviews.length;
-          const averageRating = totalReviews > 0
-            ? reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews
-            : 0;
+          const { averageRating, totalReviews } = calculateRatingData(reviews);
 
           return {
             ...property,
@@ -63,7 +63,7 @@ useEffect(() => {
     }
   };
 
-  fetchFavoritesWithReviews();
+  fetchFavoritesWithRatings();
 }, [userId]);
 
 if (loading) {
@@ -79,10 +79,11 @@ return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {favoriteProperties.map((property) => (
         <FavoriteCard 
+        key={property.id}
         property={property} 
         userId={userId} 
-        averageRating={property.averageRating} 
-        totalReviews={property.totalReviews} 
+        averageRating={property.averageRating || 0}
+        totalReviews={property.totalReviews || 0}
       />
         ))}
       </div>

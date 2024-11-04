@@ -1,14 +1,88 @@
 'use client';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FaSearch } from 'react-icons/fa';
 import { IoFilterCircleOutline } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
 import SearchBar from './SearchBar';
+import { collection, getDocs } from 'firebase/firestore';
+import { firestore } from '@/utils/firebase';
+import { useSearch } from '@/context/SearchContext';
 
 const TopNavbar = () => {
-    const pathname = usePathname(); // Get the current pathname
+  const pathname = usePathname();
+  const [properties, setProperties] = useState<any[]>([]);
+  const { searchQuery, setSearchQuery, suggestions, setSuggestions, filteredProperties, setFilteredProperties } = useSearch();
 
+
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+};
+
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const querySnapshot = await getDocs(collection(firestore, 'properties'));
+      const propertiesData = querySnapshot.docs.map(doc => doc.data());
+      setProperties(propertiesData);
+      setFilteredProperties(propertiesData);
+    };
+    fetchProperties();
+  }, []);
+
+  useEffect(() => {
+    if (!searchQuery) {
+        setSuggestions([]);
+        return;
+    }
+
+    const fetchSuggestions = async () => {
+      const querySnapshot = await getDocs(collection(firestore, 'properties'));
+      const properties = querySnapshot.docs.map(doc => doc.data());
+      
+      const locationSuggestions = Array.from(
+        new Set(
+          properties
+            .flatMap(property => [property.city, property.country])
+            .filter(location => 
+              location && 
+              location.toLowerCase().startsWith(searchQuery.toLowerCase())
+            )
+        )
+      );
+  
+      setSuggestions(locationSuggestions.slice(0, 5)); // Limit suggestions to 5 items
+    };
+  
+    fetchSuggestions();
+  }, [searchQuery]);
+
+  // Function to handle when a suggestion is clicked
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchQuery(suggestion);
+    const filtered = properties.filter(property =>
+      property.city.toLowerCase().includes(suggestion.toLowerCase()) ||
+      property.country.toLowerCase().includes(suggestion.toLowerCase())
+    );
+    setFilteredProperties(filtered);
+    setSuggestions([]);
+};
+
+  const handleSearchSubmit = () => {
+    console.log("Search submitted for:", searchQuery);
+    if (!searchQuery) {
+      setFilteredProperties(properties); // Reset to all properties if search is empty
+    } else {
+      const filtered = properties.filter(property =>
+        property.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        property.country.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredProperties(filtered);
+    }
+    setSuggestions([]); // Clear suggestions after search
+  };
 
     return (
         <nav className="bg-navbar shadow-bottom  justify-between items-center p-4 md:flex hidden px-8"> {/* Only show on medium screens and larger */}
@@ -28,7 +102,19 @@ const TopNavbar = () => {
       </div>
       
  {/* Search Bar */}
- <SearchBar placeholder="Where to?" />
+ <SearchBar 
+placeholder="Where to?" 
+searchQuery={searchQuery} 
+onSearchChange={handleSearchChange} 
+onSuggestionClick={handleSuggestionClick}
+onSearchSubmit={handleSearchSubmit}
+suggestions={suggestions}
+setSuggestions={setSuggestions}  
+/>
+
+
+
+
       <div className="flex items-center space-x-4">
        
                 <Link href="/favorites" className={` text-link font-semibold hover:text-link-hover transition duration-200 transform hover:scale-105 ${pathname === '/favorites' ? 'font-extrabold text-accent' : ''}`}>

@@ -13,6 +13,8 @@ import BottomNavbar from "@/components/BottomNavbar";
 import TopNavbar from "@/components/TopNavbar";
 import Footer from "@/components/Footer";
 import ModalInitializer from "@/components/ModalInitializer";
+import { SearchProvider } from "@/context/SearchContext";
+
 
 
 const geistSans = localFont({
@@ -38,6 +40,7 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
+      <SearchProvider>
       <html lang="en">
         <body className="bg-primary antialiased flex flex-col min-h-screen">
         <ModalInitializer />
@@ -47,6 +50,7 @@ export default function RootLayout({
   <BottomNavbar />
         </body>
       </html>
+      </SearchProvider>
     </ClerkProvider>
   );
 }

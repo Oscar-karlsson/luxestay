@@ -24,6 +24,7 @@ interface FavoriteCardProps {
   property: Property;
   averageRating: number;
   totalReviews: number;
+  userId: string;
 }
 
 const FavoriteCard: React.FC<FavoriteCardProps> = ({ property, averageRating, totalReviews }) => {
@@ -46,13 +47,14 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ property, averageRating, to
         <div className="w-1/3 lg:w-full h-48 lg:h-64 relative">
           {property.imageUrls && property.imageUrls.length > 0 ? (
             <Image
-              src={property.imageUrls[0]}
-              alt={property.title}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-l-lg lg:rounded-t-lg lg:rounded-none"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
+            src={property.imageUrls[0]}
+            alt={property.title}
+            fill
+            style={{ objectFit: 'cover' }}
+            className="rounded-l-lg lg:rounded-t-lg lg:rounded-none"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority 
+          />
           ) : (
             <div className="w-full h-full bg-gray-300 flex items-center justify-center rounded-l-lg lg:rounded-t-lg lg:rounded-none">
               <span className="text-center">No Image Available</span>

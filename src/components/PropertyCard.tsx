@@ -7,6 +7,7 @@ import { IoIosArrowForward,IoIosArrowBack } from "react-icons/io";
 import FavoriteStar from './FavoriteStar';
 import { formatPrice } from '@/utils/formatPrice';
 import Image from 'next/image';
+import RatingDisplay from './RatingDisplay';
 
 
 interface PropertyCardProps {
@@ -15,7 +16,8 @@ interface PropertyCardProps {
   city: string;
   country: string;
   price: string;
-  rating: number;
+  totalReviews: number;
+  averageRating: number;
   isFavorite: boolean;
   userId: string;
   imageUrls: string[];
@@ -27,10 +29,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   city,
   country,
   price,
-  rating,
+  averageRating,
+  totalReviews,
   isFavorite,
   userId,
-  imageUrls
+  imageUrls,
 }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -68,6 +71,33 @@ const [atEnd, setAtEnd] = useState(false);
     emblaApi.on('select', onSelect);
   }, [emblaApi, onSelect]);
 
+  const MAX_VISIBLE_DOTS = 5;
+
+  const getVisibleDots = () => {
+    const totalDots = scrollSnaps.length;
+  
+    // If there are fewer dots than the max, display them all
+    if (totalDots <= MAX_VISIBLE_DOTS) {
+      return scrollSnaps.map((_, index) => index);
+    }
+  
+    // Center the selected dot at position 3 until near the end
+    const halfWindow = Math.floor(MAX_VISIBLE_DOTS / 2);
+  
+    // If we are near the start, start the window from the first dot
+    if (selectedIndex <= halfWindow) {
+      return Array.from({ length: MAX_VISIBLE_DOTS }, (_, i) => i);
+    }
+  
+    // If we are near the end, keep the last MAX_VISIBLE_DOTS visible
+    if (selectedIndex >= totalDots - halfWindow - 1) {
+      return Array.from({ length: MAX_VISIBLE_DOTS }, (_, i) => totalDots - MAX_VISIBLE_DOTS + i);
+    }
+  
+    // Keep the selected dot at the center of the visible window
+    return Array.from({ length: MAX_VISIBLE_DOTS }, (_, i) => selectedIndex - halfWindow + i);
+  };
+
 
   const formattedPrice = formatPrice(Number(price)); // Use the utility function
 
@@ -89,14 +119,15 @@ const [atEnd, setAtEnd] = useState(false);
         <div className="embla__container flex">
             {imageUrls.map((image, index) => (
                 <div key={index} className="embla__slide flex-shrink-0 w-full h-48 lg:h-64 relative">
-                    <Image 
-                        src={image} 
-                        alt={`${title} Image ${index + 1}`} 
-                        layout="fill" 
-                        objectFit="cover" 
-                        className="rounded-lg" 
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
+                <Image
+      src={image}
+      alt={`${title} Image ${index + 1}`}
+      fill
+      style={{ objectFit: 'cover' }}
+      className="rounded-lg"
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      priority={index === 0} // Add priority to the first image
+    />
           </div>
         ))}
       </div>
@@ -111,24 +142,26 @@ const [atEnd, setAtEnd] = useState(false);
 
           {/* Pagination Dots */}
           <div className="absolute bottom-0 left-0 right-0 flex justify-center mb-4">
-            {scrollSnaps.map((_, index) => (
+            {getVisibleDots().map((dotIndex) => (
               <button
-                key={index}
-                className={`w-2 h-2 rounded-full mx-1 ${index === selectedIndex ? 'bg-black' : 'bg-gray-300'}`}
-                onClick={() => scrollTo(index)}
+                key={dotIndex}
+                className={`w-2 h-2 rounded-full mx-1 ${dotIndex === selectedIndex ? 'bg-black' : 'bg-gray-300'}`}
+                onClick={() => scrollTo(dotIndex)}
               />
             ))}
           </div>
+
         </div>
 
         {/* Info Section */}
         <div className="p-4">
           <div className="flex justify-between items-center">
             <h3 className="font-bold text-primaryText text-h5-mobile sm:text-h5-desktop">{title}</h3>
-            <div className="flex items-center">
-              <AiFillStar className="text-favoriteActive" />
-              <span className="ml-2 text-secondaryText text-b1-mobile sm:text-b1-desktop">{rating.toFixed(2)}</span>
-            </div>
+            {totalReviews > 0 && (
+  <div className="flex items-center">
+    <RatingDisplay averageRating={averageRating} totalReviews={totalReviews} />
+  </div>
+)}
           </div>
           <p className="text-primaryText font-medium mt-2 text-b1-mobile sm:text-b1-desktop">
   {city}, {country}

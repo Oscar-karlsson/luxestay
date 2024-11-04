@@ -1,40 +1,84 @@
 'use client';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import { IoFilterCircleOutline } from "react-icons/io5";
 
 interface SearchBarProps {
   placeholder: string;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  onSearchSubmit: () => void;
+  onSuggestionClick: (suggestion: string) => void;
+  suggestions: string[];
+  setSuggestions: (suggestions: string[]) => void;
 }
 
-const SearchBar: FunctionComponent<SearchBarProps> = ({ placeholder }) => {
-  const [inputValue, setInputValue] = useState('');
 
+const SearchBar: FunctionComponent<SearchBarProps> = ({
+  placeholder,
+  searchQuery,
+  onSearchChange,
+  onSearchSubmit,
+  onSuggestionClick,
+  suggestions,
+  setSuggestions,
+}) => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
+    onSearchChange(event.target.value);
   };
 
   const handleClearInput = () => {
-    setInputValue('');
+    onSearchChange('');
+    setSuggestions([]); // Clear suggestions when input is cleared
   };
 
+  useEffect(() => {
+    if (suggestions.includes(searchQuery)) {
+      setSuggestions([]); // Clear suggestions when a suggestion is selected
+    }
+  }, [searchQuery, suggestions, setSuggestions]);
+
   return (
-    <div className="relative flex flex-grow mx-4">
-      <input
-        type="text"
-        value={inputValue}
-        onChange={handleInputChange}
-        placeholder={placeholder}
-        className="border border-gray-300 rounded-full py-2 px-4 flex-grow focus:outline-none pl-10 pr-10"
-      />
-      <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primaryText" />
-      {inputValue && (
-        <FaTimes
-  className="absolute right-14 top-1/2 transform -translate-y-1/2 text-primaryText cursor-pointer hover:text-primaryText-hover rounded-full hover:bg-gray-200 p-1 text-xl"
-  onClick={handleClearInput}
+    <div className="relative flex flex-col w-full max-w-lg mx-4">
+      <div className="flex items-center w-full bg-white border rounded-full px-4 py-2 shadow-md">
+      <FaSearch 
+  className="mr-3 text-primaryText cursor-pointer" 
+  onClick={onSearchSubmit} 
 />
-      )}
-      <IoFilterCircleOutline className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primaryText cursor-pointer text-3xl" />
+<input
+  type="text"
+  value={searchQuery || ''} // Ensure value is always a string
+  onChange={handleInputChange} 
+  placeholder={placeholder}
+  className="flex-grow focus:outline-none"
+/>
+        {searchQuery && (
+          <FaTimes
+            className="cursor-pointer text-gray-500 hover:text-gray-700"
+            onClick={handleClearInput}
+          />
+        )}
+        <IoFilterCircleOutline className="ml-3 text-primaryText text-3xl" />
+      </div>
+      
+      {/* Suggestions dropdown */}
+    {/* Suggestions dropdown */}
+{(suggestions && suggestions.length > 0) && (
+  <ul className="absolute top-full mt-1 bg-white border rounded-md shadow-lg w-full max-w-lg z-50">
+{suggestions.map((suggestion, index) => (
+  <li
+    key={index}
+    className="p-2 cursor-pointer hover:bg-gray-100"
+    onClick={() => {
+      onSearchChange(suggestion); // Set input to selected suggestion
+      setSuggestions([]);         // Directly clear suggestions here
+    }}
+  >
+    {suggestion}
+  </li>
+))}
+  </ul>
+)}
     </div>
   );
 };

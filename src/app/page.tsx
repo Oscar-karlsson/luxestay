@@ -7,11 +7,15 @@ import SearchBar from '@/components/SearchBar';
 import { getReviewsForProperty } from '@/services/reviewService';
 import { calculateRatingData } from '@/utils/ratingUtils';
 import { useSearch } from '@/context/SearchContext';
+import FilterModal from '@/components/FilterModal';
 
 const Explore = () => {
   const [properties, setProperties] = useState<any[]>([]);
   const { searchQuery, setSearchQuery, filteredProperties, setFilteredProperties, suggestions, setSuggestions } = useSearch();
   const [loading, setLoading] = useState(true);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+const openFilterModal = () => setIsFilterModalOpen(true);
+const closeFilterModal = () => setIsFilterModalOpen(false);
   
 
   // Fetch property data from Firestore
@@ -89,7 +93,8 @@ useEffect(() => {
     setSuggestions([]); // Clear suggestions here
   }}
   suggestions={suggestions}
-  setSuggestions={setSuggestions} // Ensure setSuggestions is passed here
+  setSuggestions={setSuggestions}
+  onFilterClick={openFilterModal} // Pass the filter modal function here
 />
 
     </div>
@@ -116,6 +121,8 @@ useEffect(() => {
           ) : (
             <p>No properties found.</p>
         )}
+
+<FilterModal isOpen={isFilterModalOpen} onRequestClose={closeFilterModal} />
       </div>
     </div>
   </div>

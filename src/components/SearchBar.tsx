@@ -11,6 +11,7 @@ interface SearchBarProps {
   onSuggestionClick: (suggestion: string) => void;
   suggestions: string[];
   setSuggestions: (suggestions: string[]) => void;
+  onFilterClick: () => void; 
 }
 
 
@@ -22,6 +23,7 @@ const SearchBar: FunctionComponent<SearchBarProps> = ({
   onSuggestionClick,
   suggestions,
   setSuggestions,
+  onFilterClick,
 }) => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onSearchChange(event.target.value);
@@ -58,7 +60,10 @@ const SearchBar: FunctionComponent<SearchBarProps> = ({
             onClick={handleClearInput}
           />
         )}
-        <IoFilterCircleOutline className="ml-3 text-primaryText text-3xl" />
+       <IoFilterCircleOutline 
+  className="ml-3 text-primaryText text-3xl cursor-pointer" 
+  onClick={onFilterClick} // Call the filter click handler here
+/>
       </div>
       
       {/* Suggestions dropdown */}

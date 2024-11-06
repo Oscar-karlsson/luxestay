@@ -9,12 +9,15 @@ import SearchBar from './SearchBar';
 import { collection, getDocs } from 'firebase/firestore';
 import { firestore } from '@/utils/firebase';
 import { useSearch } from '@/context/SearchContext';
+import FilterModal from './FilterModal';
 
 const TopNavbar = () => {
   const pathname = usePathname();
   const [properties, setProperties] = useState<any[]>([]);
   const { searchQuery, setSearchQuery, suggestions, setSuggestions, filteredProperties, setFilteredProperties } = useSearch();
-
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+const openFilterModal = () => setIsFilterModalOpen(true);
+const closeFilterModal = () => setIsFilterModalOpen(false);
 
 
   const handleSearchChange = (query: string) => {
@@ -102,14 +105,18 @@ const TopNavbar = () => {
       </div>
       
  {/* Search Bar */}
- <SearchBar 
-placeholder="Where to?" 
-searchQuery={searchQuery} 
-onSearchChange={handleSearchChange} 
-onSuggestionClick={handleSuggestionClick}
-onSearchSubmit={handleSearchSubmit}
-suggestions={suggestions}
-setSuggestions={setSuggestions}  
+ <SearchBar
+  placeholder="Where to?"
+  searchQuery={searchQuery}
+  onSearchChange={setSearchQuery}
+  onSearchSubmit={() => setFilteredProperties(filteredProperties)}
+  onSuggestionClick={(suggestion) => {
+    setSearchQuery(suggestion);
+    setSuggestions([]); // Clear suggestions here
+  }}
+  suggestions={suggestions}
+  setSuggestions={setSuggestions}
+  onFilterClick={openFilterModal} // Pass the filter modal function here
 />
 
 
@@ -127,6 +134,8 @@ setSuggestions={setSuggestions}
                     <CgProfile className="text-3xl" />
                 </Link>
       </div>
+
+      <FilterModal isOpen={isFilterModalOpen} onRequestClose={closeFilterModal} />
     </nav>
       );
     };

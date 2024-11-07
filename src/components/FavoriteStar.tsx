@@ -9,6 +9,7 @@ import { firestore } from '@/utils/firebase';
 interface FavoriteStarProps {
   propertyId: string;
   isFavorite: boolean;
+  isfavorite: boolean;
 }
 
 const FavoriteStar: React.FC<FavoriteStarProps> = ({ propertyId, isFavorite }) => {

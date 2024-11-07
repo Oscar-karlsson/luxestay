@@ -75,23 +75,23 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ property, averageRating, to
           </div>
 
           {/* Title stays under the rating on smaller screens */}
-          <h2 className="text-lg font-semibold lg:hidden mt-2">{property.title}</h2>
+          <h3 className="text-primaryText font-semi-bold text-h5-mobile lg:text-h5-desktop lg:hidden mt-2">{property.title}</h3>
 
           {/* Location for smaller screens */}
-          <p className="text-sm text-gray-500 mt-2 lg:hidden">
-            {property.city}, {property.country}
-          </p>
+          <p className="text-primaryText font-regular text-b1-mobile lg:text-b1-desktop mt-2 lg:hidden">
+  {property.city}, {property.country}
+</p>
 
           {/* Bottom Section for smaller screens: Price on the left */}
           <div className="flex justify-start items-center mt-2 lg:hidden">
-            <span className="text-lg font-bold">
-              {formatPrice(Number(property.price))} / night
-            </span>
+          <span className="text-secondaryText text-b3-mobile lg:text-b3-desktop font-regular">
+  {formatPrice(Number(property.price))} / night
+</span>
           </div>
 
           {/* For larger screens: Title and rating stay on the same row */}
           <div className="hidden lg:flex justify-between items-center">
-            <h2 className="text-lg font-semibold">{property.title}</h2>
+          <h3 className="text-primaryText font-semibold text-h5-mobile lg:text-h5-desktop">{property.title}</h3>
             {totalReviews > 0 && (
     <span className="text-gray-600 flex items-center">
         <RatingDisplay averageRating={averageRating} totalReviews={totalReviews} />
@@ -100,15 +100,15 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ property, averageRating, to
           </div>
 
           {/* Location for larger screens */}
-          <p className="text-sm text-gray-500 mt-2 hidden lg:block">
-            {property.city}, {property.country}
-          </p>
+          <p className="text-primaryText font-regular text-b1-mobile lg:text-b1-desktop mt-2 hidden lg:block">
+  {property.city}, {property.country}
+</p>
 
           {/* Price for larger screens, below location */}
           <div className="hidden lg:block mt-2">
-            <span className="text-lg font-bold">
-              {formatPrice(Number(property.price))} / night
-            </span>
+          <span className="text-secondaryText text-b3-mobile lg:text-b3-desktop font-regular">
+    {formatPrice(Number(property.price))} / night
+  </span>
           </div>
         </div>
       </div>

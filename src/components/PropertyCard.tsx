@@ -102,7 +102,7 @@ const [atEnd, setAtEnd] = useState(false);
   const formattedPrice = formatPrice(Number(price)); // Use the utility function
 
   return (
-    <div className="bg-white shadow-lg rounded-lg overflow-hidden relative">
+    <div className="bg-card shadow-lg rounded-lg overflow-hidden relative">
       
     {/* Favorite Star Icon - Outside Link */}
     <div className="absolute top-2 right-2 z-10" onClick={(event) => event.stopPropagation()}>
@@ -124,7 +124,7 @@ const [atEnd, setAtEnd] = useState(false);
       alt={`${title} Image ${index + 1}`}
       fill
       style={{ objectFit: 'cover' }}
-      className="rounded-lg"
+      className="rounded-t-lg"
       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       priority={index === 0} // Add priority to the first image
     />
@@ -154,19 +154,21 @@ const [atEnd, setAtEnd] = useState(false);
         </div>
 
         {/* Info Section */}
-        <div className="p-4">
+        <div className="p-2">
           <div className="flex justify-between items-center">
-            <h3 className="font-bold text-primaryText text-h5-mobile sm:text-h5-desktop">{title}</h3>
+          <h3 className="font-semi-bold text-primaryText text-h5-mobile lg:text-h5-desktop">{title}</h3>
             {totalReviews > 0 && (
   <div className="flex items-center">
     <RatingDisplay averageRating={averageRating} totalReviews={totalReviews} />
   </div>
 )}
           </div>
-          <p className="text-primaryText font-medium mt-2 text-b1-mobile sm:text-b1-desktop">
+          <p className="text-primaryText font-mregular mt-2 text-b1-mobile lg:text-b1-desktop">
   {city}, {country}
 </p>
-          <p className="text-secondaryText font-regular mt-2 text-b4-mobile sm:text-b4-desktop">From {formattedPrice} / night</p>
+<p className="text-secondaryText font-regular mt-2 text-b4-mobile lg:text-b4-desktop">
+  {formattedPrice} / night
+</p>
         </div>
       </div>
     </Link>

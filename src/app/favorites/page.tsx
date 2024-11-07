@@ -16,7 +16,7 @@ type Property = {
   country: string;
   price: string;
   rating: number;
-  userID: string;
+  userID: string[];
   isFavorite: boolean;
   imageUrls: string[];
   reviews?: { name: string; review: string; date: string; ranking: number }[];

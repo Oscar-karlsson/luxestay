@@ -17,14 +17,14 @@ const NumberFilter: React.FC<NumberFilterProps> = ({ label, onChange, max, min, 
     onChange(newValue);
   };
 
-  const handleDecrease = () => {
-    if (value === null || value === (min ?? 1)) {
-      onChange(null); // Reset to "All"
-      return;
-    }
-    const newValue = value - 1;
-    onChange(newValue);
-  };
+const handleDecrease = () => {
+  if (value === null || value === (min ?? 1)) {
+    onChange(null); // Reset to "All"
+    return;
+  }
+  const newValue = value - 1;
+  onChange(newValue);
+};
 
   return (
     <div className="flex items-center justify-between py-2">
@@ -36,7 +36,7 @@ const NumberFilter: React.FC<NumberFilterProps> = ({ label, onChange, max, min, 
         {/* Decrease Button */}
         <button
   onClick={handleDecrease}
-  className={`w-8 h-8 border rounded-full ${value === null || value === (min ?? 1) ? 'opacity-50 cursor-not-allowed' : ''}`}
+  className={`w-8 h-8 border rounded-full ${value === null || value === null ? 'opacity-50 cursor-not-allowed' : ''}`}
   disabled={value === null}
 >
   −

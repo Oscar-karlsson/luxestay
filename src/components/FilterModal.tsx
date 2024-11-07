@@ -51,6 +51,7 @@ interface FilterModalProps {
     className="filter-modal"
     overlayClassName="filter-overlay"
     ariaHideApp={false}
+    
   >
     {/* Modal Header */}
     <div className="filter-header flex items-center border-b pb-2 mb-4">
@@ -59,7 +60,7 @@ interface FilterModalProps {
 </div>
 
     {/* Modal Content */}
-    <div className="filter-content overflow-y-auto flex-grow pb-20">
+    <div className="filter-content overflow-y-auto flex-grow pb-20 max-h-[80vh]">
          {/* Price Range Filter */}
          <PriceRangeFilter
           minPrice={minPrice}

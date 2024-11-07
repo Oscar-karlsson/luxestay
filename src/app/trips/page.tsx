@@ -94,13 +94,13 @@ const TripsPage: React.FC = () => {
       {/* Toggle for Upcoming and Done */}
       <div className="flex justify-center mb-6">
         <button
-          className={`w-32 py-2 font-semibold rounded-l-full ${activeTab === 'upcoming' ? 'bg-black text-white' : 'bg-gray-300 text-gray-500'}`}
+          className={`w-32 py-2 font-semibold rounded-l-full ${activeTab === 'upcoming' ? 'bg-primaryButton hover:bg-primaryButtonHover text-primaryButtonText' : 'bg-secondaryButton text-secondaryButtonText hover:bg-secondaryButtonHover'}`}
           onClick={() => setActiveTab('upcoming')}
         >
           Upcoming
         </button>
         <button
-          className={`w-32 py-2 font-semibold rounded-r-full ${activeTab === 'done' ? 'bg-black text-white' : 'bg-gray-300 text-gray-500'}`}
+          className={`w-32 py-2 font-semibold rounded-r-full ${activeTab === 'done' ? 'bg-primaryButton hover:bg-primaryButtonHover text-primaryButtonText' : 'bg-secondaryButton text-secondaryButtonText hover:bg-secondaryButtonHover'}`}
           onClick={() => setActiveTab('done')}
         >
           Done

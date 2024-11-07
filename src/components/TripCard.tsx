@@ -65,7 +65,7 @@ const TripCard: React.FC<TripCardProps> = ({
 
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-4 mb-4 max-w-md mx-auto lg:max-w-lg xl:max-w-xl">
+    <div className="bg-card shadow-lg rounded-lg p-4 mb-4 max-w-md mx-auto lg:max-w-lg xl:max-w-xl">
 
       {/* Booking ID and Canceled label */}
       <div className="flex justify-between items-center">
@@ -102,7 +102,7 @@ const TripCard: React.FC<TripCardProps> = ({
     <button
       onClick={handleOpenReviewModal}
       className={`py-2 px-4 rounded-lg flex-1 font-semi-bold text-b1-mobile lg:text-b1-desktop ${
-        isCanceled ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-secondaryButton text-secondaryButtonText'
+        isCanceled ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-secondaryButton text-secondaryButtonText hover:bg-secondaryButtonHover'
       }`}
       disabled={isCanceled} // Disable if canceled
     >
@@ -111,7 +111,7 @@ const TripCard: React.FC<TripCardProps> = ({
   )}
 
           <button 
-            className="bg-primaryButton text-primaryButtonText text-b1-mobile lg:text-b1-desktop font-semi-bold py-2 px-4 rounded-lg flex-1"
+            className="bg-primaryButton text-primaryButtonText text-b1-mobile lg:text-b1-desktop font-semi-bold py-2 px-4 rounded-lg flex-1 hover:bg-primaryButtonHover"
           >
             Book Again
           </button>
@@ -123,13 +123,13 @@ const TripCard: React.FC<TripCardProps> = ({
       {!isCompleted && !isCanceled && (
         <div className="mt-4 flex justify-between space-x-4">
    <button 
-      className="bg-gray-200 text-black font-semibold py-2 px-4 rounded-lg flex-1"
+      className="bg-secondaryButton text-secondaryButtonText font-semibold py-2 px-4 rounded-lg flex-1 hover:bg-secondaryButtonHover"
       onClick={onCancel}  // Call onCancel function
     >
       Cancel
     </button>
           <button 
-            className="bg-black text-white font-semibold py-2 px-4 rounded-lg flex-1">
+            className="bg-primaryButton text-primaryButtonText font-semibold py-2 px-4 rounded-lg flex-1 hover:bg-primaryButtonHover">
             View Details
           </button>
         </div>

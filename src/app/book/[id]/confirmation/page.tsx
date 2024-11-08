@@ -5,12 +5,22 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/utils/firebase';
 import { FaCheck } from 'react-icons/fa';
+import CustomModal from '@/components/CustomModal';
 
 const ConfirmationPage: React.FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const bookingId = searchParams.get('bookingId');
   const [bookingData, setBookingData] = useState<any>(null);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  // Determine if it's a small screen
+  useEffect(() => {
+    const handleResize = () => setIsSmallScreen(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fetch booking data from Firestore
   useEffect(() => {
@@ -50,12 +60,12 @@ const ConfirmationPage: React.FC = () => {
   const nights = endDate && startDate ? (endDate.toDate() - startDate.toDate()) / (1000 * 60 * 60 * 24) : 0;
   const total = pricePerNight * nights + cleaningFee + serviceFee;
 
-  return (
+  const content = (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
       <h1 className="text-3xl font-semibold mb-4">Booking Confirmed!</h1>
       <div className="w-16 h-16 border-8 border-black rounded-full flex items-center justify-center mb-6">
-  <FaCheck className="text-black text-4xl" /> {/* Use the checkmark icon */}
-</div>
+        <FaCheck className="text-black text-4xl" /> {/* Checkmark icon */}
+      </div>
       
       {/* Booking Details Card */}
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
@@ -71,7 +81,7 @@ const ConfirmationPage: React.FC = () => {
             <p className="text-gray-500">{location}</p>
           </div>
         </div>
-
+  
         {/* Price Details */}
         <div className="border-t border-gray-200 pt-4">
           <p className="font-medium mb-2">Price details</p>
@@ -94,7 +104,7 @@ const ConfirmationPage: React.FC = () => {
           </div>
         </div>
       </div>
-
+  
       <p className="text-lg mt-8">Enjoy your stay!</p>
       <button
         onClick={() => router.push('/')}
@@ -104,6 +114,19 @@ const ConfirmationPage: React.FC = () => {
       </button>
     </div>
   );
-};
+  
+  // Render the ConfirmationPage
+  return (
+    <>
+        {isSmallScreen ? (
+            <CustomModal isOpen={true} onClose={() => router.push('/')}>
+                {content}
+            </CustomModal>
+        ) : (
+            content
+        )}
+    </>
+);
+  };
 
 export default ConfirmationPage;

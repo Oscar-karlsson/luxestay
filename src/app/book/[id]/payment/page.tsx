@@ -6,11 +6,21 @@ import Image from 'next/image';
 import { formatPrice } from '@/utils/formatPrice';
 import CardForm from '@/components/CardForm';
 import PaymentLayout from './PaymentLayout';
+import CustomModal from '@/components/CustomModal';
 
 
 const PaymentPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+    // Determine if it's a small screen
+    useEffect(() => {
+      const handleResize = () => setIsSmallScreen(window.innerWidth < 768);
+      handleResize();
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
 
   // Retrieve data from query parameters
@@ -63,8 +73,7 @@ const PaymentPage: React.FC = () => {
     router.push(`/book/${propertyId}/confirmation?bookingId=${bookingId}`);
   };
 
-  return (
-    <PaymentLayout>
+  const content = (
     <div className="max-w-md mx-auto p-6">
       <button className="text-lg mb-4" onClick={() => router.back()}>
         &larr; Back
@@ -113,23 +122,35 @@ const PaymentPage: React.FC = () => {
         </div>
       </div>
 
-    {/* Payment Method */}
-    {clientSecret && (
-     <CardForm
-     clientSecret={clientSecret}
-     handlePaymentSuccess={handlePaymentSuccess} 
-     propertyId={propertyId}
-     startDate={startDate}
-     endDate={endDate}
-     propertyTitle={propertyTitle}
-     imageUrl={imageUrl}
-     location={propertyLocation}
-     pricePerNight={price}
-     cleaningFee={cleaningFee}
-     serviceFee={serviceFee}
-   />
-        )}
-      </div>
+      {/* Payment Method */}
+      {clientSecret && (
+        <CardForm
+          clientSecret={clientSecret}
+          handlePaymentSuccess={handlePaymentSuccess} 
+          propertyId={propertyId}
+          startDate={startDate}
+          endDate={endDate}
+          propertyTitle={propertyTitle}
+          imageUrl={imageUrl}
+          location={propertyLocation}
+          pricePerNight={price}
+          cleaningFee={cleaningFee}
+          serviceFee={serviceFee}
+        />
+      )}
+    </div>
+  );
+
+  // Render the PaymentPage
+  return (
+    <PaymentLayout>
+      {isSmallScreen ? (
+        <CustomModal isOpen={true} onClose={() => router.back()}>
+          {content}
+        </CustomModal>
+      ) : (
+        <>{content}</>
+      )}
     </PaymentLayout>
   );
 };

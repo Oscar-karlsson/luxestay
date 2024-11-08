@@ -19,7 +19,7 @@ interface ReviewCardProps {
     const truncatedReview = review.length > maxLength ? `${review.substring(0, maxLength)}...` : review;
   
     return (
-      <div className="review-card bg-gray-100 p-4 rounded-lg shadow-md space-y-3">
+      <div className="review-card bg-gray-100 p-4 rounded-lg shadow-md space-y-3 h-64 overflow-hidden">
         <div className="flex items-center space-x-4">
           {/* Display user profile picture */}
           <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
@@ -37,13 +37,13 @@ interface ReviewCardProps {
           </div>
         </div>
   
-        <div className="text-gray-700">
+        <div className="text-primaryText break-words">
           {truncatedReview}
         </div>
   
         {/* Show More button */}
         {review.length > maxLength && (
-          <button onClick={() => onShowMore(review)} className="text-blue-500 underline text-sm" aria-label={`Show full review for ${name}`}>
+          <button onClick={() => onShowMore(review)} className="text-accent text-b1-mobile font-semi-bold underline text-sm" aria-label={`Show full review for ${name}`}>
           Show More
         </button>
         )}

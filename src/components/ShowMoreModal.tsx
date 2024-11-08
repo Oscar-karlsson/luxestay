@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, ReactNode } from 'react';
 import Modal from 'react-modal';
 import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
+import { FiX } from 'react-icons/fi';
+
 
 interface ShowMoreModalProps {
     isOpen: boolean;
@@ -37,7 +39,10 @@ interface ShowMoreModalProps {
     >
       <div ref={modalRef}>
         <div className="modal-header">
-          <button onClick={onClose} className="close-btn">Close</button>
+        <button onClick={onClose} className="absolute top-2 right-3 text-gray-600 text-2xl" aria-label="Close">
+    <FiX />
+</button>
+
         </div>
         <div className="show-more-modal-body">{children}</div>
       </div>

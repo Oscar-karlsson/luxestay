@@ -193,3 +193,80 @@ input[type="number"] {
 
 
 
+
+
+/* Title Specific Styling */
+.cl-headerTitle {
+  font-family: 'Playfair Display', serif !important; /* Unique font for title */
+  font-size: var(--font-size-h3-mobile) !important;
+  color: var(--primary-text-color) !important;
+  font-weight: var(--font-weight-semi-bold); /* Adjust as needed */
+}
+
+@media (min-width: 768px) {
+  .cl-headerTitle {
+    font-size: var(--font-size-h4-desktop) !important;
+  }
+}
+
+/* Subtitle and Other Headers */
+.cl-headerSubtitle,
+.cl-formFieldLabel,
+.cl-footerActionText,
+.cl-footerActionLink {
+  font-family: 'Open Sans', sans-serif !important; /* General font family */
+  font-size: var(--font-size-b3-mobile) !important;
+  color: var(--secondary-text-color) !important;
+}
+
+@media (min-width: 768px) {
+  .cl-headerSubtitle {
+    font-size: var(--font-size-b3-desktop) !important;
+  }
+}
+
+/* Button Styling */
+.cl-formButtonPrimary {
+  background-color: var(--primary-button-color) !important;
+  color: var(--primary-button-text-color) !important;
+  font-family: 'Open Sans', sans-serif !important;
+}
+
+.cl-formButtonPrimary:hover {
+  background-color: var(--primary-button-hover) !important;
+}
+
+/* Link Colors */
+.cl-footerActionLink,
+.cl-formFieldAction {
+  color: var(--link-color) !important;
+}
+
+.cl-footerActionLink:hover,
+.cl-formFieldAction:hover {
+  color: var(--link-hover-color) !important;
+}
+
+
+
+/* Divider Line Styling */
+.cl-dividerLine {
+  background-color: var(--divider-color) !important;
+  height: 1px; /* Adjust thickness as needed */
+  opacity: 0.7; /* Optional: Adjust for a softer look */
+}
+
+/* Divider Text Styling */
+.cl-dividerText {
+  color: var(--secondary-text-color) !important;
+  font-family: 'Open Sans', sans-serif !important;
+  font-size: var(--font-size-b3-mobile) !important;
+  font-weight: var(--font-weight-regular);
+  padding: 0 10px; /* Space around the text */
+}
+
+@media (min-width: 768px) {
+  .cl-dividerText {
+    font-size: var(--font-size-b3-desktop) !important;
+  }
+}

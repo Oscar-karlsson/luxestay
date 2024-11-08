@@ -16,8 +16,11 @@ import PropertyMap from '@/components/PropertyMap';
 import Image from 'next/image';
 import { useUser } from '@clerk/clerk-react';
 import { getReviewsForProperty } from '@/services/reviewService';
+import { FiX } from 'react-icons/fi';
+import { timeAgo } from '@/utils/dateUtils';
 
-type ShowMoreSection = 'description' | 'features' | 'houseRules' | 'services';
+
+type ShowMoreSection = 'description' | 'features' | 'houseRules' | 'services' | 'safetyFeatures';
 
 const PropertyDetail = () => {
     const { id } = useParams();
@@ -34,13 +37,22 @@ const PropertyDetail = () => {
     const [emblaRef, emblaApi] = EmblaCarouselReact({ loop: false, slidesToScroll: 1 });
     const { user } = useUser();
 const userId = user ? user.id : '';
+const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+const [reviewModalContent, setReviewModalContent] = useState<{
+    name: string;
+    comment: string;
+    profileImageUrl: string;
+    date: Date;
+    ranking: number;
+} | null>(null);
 
     // Set initial "Show More" state for different sections
     const [showMore, setShowMore] = useState({
         description: false,
         features: false,
         houseRules: false,
-        services: false
+        services: false,
+        safetyFeatures: false
     });
 
     // Control how many items to show initially for each section
@@ -48,7 +60,8 @@ const userId = user ? user.id : '';
         description: 150,  // Number of characters for description before truncating
         features: 3,       // Show 3 features initially 
         houseRules: 2,     // Show 2 house rules initially
-        services: 2        // Show 3 services initially
+        services: 2,        // Show 3 services initially
+        safetyFeatures: 2  // Show 2 safety features initially
     };
 
 
@@ -83,6 +96,14 @@ const userId = user ? user.id : '';
                 <ul className="space-y-1 mt-2">
                     {property?.services && property.services.map((service, index) => (
                         <li key={index} className="text-gray-600">{service}</li>
+                    ))}
+                </ul>
+            );
+        } else if (section === 'safetyFeatures') {
+            modalContent = (
+                <ul className="space-y-1 mt-2">
+                    {property?.safetyFeatures && property.safetyFeatures.map((feature, index) => (
+                        <li key={index} className="text-gray-600">{feature}</li>
                     ))}
                 </ul>
             );
@@ -256,7 +277,7 @@ const userId = user ? user.id : '';
                     {property?.details?.description.length > maxItemsToShow.description && (
                 <button
                 onClick={() => handleShowMoreToggle('description', property?.details?.description || '')}
-                className="text-blue-500 underline mt-2"
+                className="text-accent text-b1-mobile font-semi-bold underline mt-2"
               >
                 Show More
               </button>
@@ -310,7 +331,7 @@ const userId = user ? user.id : '';
                         {property?.details?.features.length > maxItemsToShow.features && (
                             <button
                                 onClick={() => handleShowMoreToggle('features')}
-                                className="text-blue-500 underline mt-2"
+                                 className="text-accent text-b1-mobile font-semi-bold underline mt-2"
                             >
                                 {showMore.features ? "Show Less" : "Show More"}
                             </button>
@@ -334,7 +355,7 @@ const userId = user ? user.id : '';
     {property?.houseRules?.length > maxItemsToShow.houseRules && (
         <button
             onClick={() => handleShowMoreToggle('houseRules')}
-            className="text-blue-500 underline mt-2"
+           className="text-accent text-b1-mobile font-semi-bold underline mt-2"
         >
             {showMore.houseRules ? "Show Less" : "Show More"}
         </button>
@@ -359,7 +380,7 @@ const userId = user ? user.id : '';
     {property?.services?.length > maxItemsToShow.services && (
         <button
             onClick={() => handleShowMoreToggle('services')}
-            className="text-blue-500 underline mt-2"
+            className="text-accent text-b1-mobile font-semi-bold underline mt-2"
         >
             {showMore.services ? "Show Less" : "Show More"}
         </button>
@@ -368,6 +389,31 @@ const userId = user ? user.id : '';
 
   {/* Divider */}
   <hr className="block md:hidden my-4 border-t border-divider" />
+
+  {/* Safety Features */}
+<div className="mt-6">
+    <h2 className="text-lg font-bold">Safety Features</h2>
+    <ul className="space-y-1 mt-2">
+        {property?.safetyFeatures &&
+            property.safetyFeatures
+                .slice(0, showMore.safetyFeatures ? property.safetyFeatures.length : maxItemsToShow.safetyFeatures)
+                .map((feature, index) => (
+                    <li key={index} className="text-gray-600">{feature}</li>
+                ))
+        }
+    </ul>
+    {property?.safetyFeatures?.length > maxItemsToShow.safetyFeatures && (
+     <button
+     onClick={() => handleShowMoreToggle('safetyFeatures')}
+     className="text-accent text-b1-mobile font-semi-bold underline mt-2"
+ >
+     {showMore.safetyFeatures ? "Show Less" : "Show More"}
+ </button>
+    )}
+</div>
+
+                    {/* Divider */}
+                    <hr className="block md:hidden my-4 border-t border-divider" />
 
 {/* Reviews Section */}
 <div className="mt-6">
@@ -379,17 +425,23 @@ const userId = user ? user.id : '';
       <div className="embla__container">
       {reviews.map((review, index) => (
           <div className="embla__slide" key={index}>
-            <ReviewCard
-             name={review.name}
-              review={review.comment} 
-              date={review.timestamp.toDate()}
-              ranking={review.rating}
-              profileImageUrl={review.profileImageUrl}
-              onShowMore={(fullReview) => {
-                setModalContent(fullReview); // Set the content
-                setIsShowMoreModalOpen(true); // Open the modal
-              }}
-            />
+<ReviewCard
+    name={review.name}
+    review={review.comment}
+    date={review.timestamp.toDate()}
+    ranking={review.rating}
+    profileImageUrl={review.profileImageUrl}
+    onShowMore={() => {
+        setReviewModalContent({
+            name: review.name,
+            comment: review.comment,
+            profileImageUrl: review.profileImageUrl,
+            date: review.timestamp.toDate(),
+            ranking: review.rating,
+        });
+        setIsReviewModalOpen(true);
+    }}
+/>
           </div>
         ))}
       </div>
@@ -430,44 +482,77 @@ const userId = user ? user.id : '';
         {isSmallScreen && (
             <CustomModal isOpen={true} onClose={() => router.back()}>
                 {content}
-
+    
                 {/* Show More Modal inside CustomModal */}
                 {isShowMoreModalOpen && (
                     <ShowMoreModal
                         isOpen={isShowMoreModalOpen}
                         onClose={() => setIsShowMoreModalOpen(false)}
                     >
-                        <div className="p-4 text-gray-700">
+                     
+                     <div className="p-4 text-primaryText break-words">
                             {modalContent} {/* Show full review content */}
                         </div>
-                        <button
-                            className="mt-4 text-blue-500 underline"
-                            onClick={() => setIsShowMoreModalOpen(false)} // Close the modal
-                        >
-                            Close
-                        </button>
                     </ShowMoreModal>
                 )}
             </CustomModal>
         )}
-
+    
         {!isSmallScreen && content}
 
+        {isReviewModalOpen && reviewModalContent && (
+            <ShowMoreModal
+                isOpen={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+            >
+                <div className="p-4 text-gray-700 break-words">
+                    <div className="flex items-center space-x-4 mb-4">
+                        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
+                            <Image 
+                                src={reviewModalContent.profileImageUrl || '/profile.png'} 
+                                alt={`${reviewModalContent.name}'s profile picture`} 
+                                width={48} 
+                                height={48} 
+                                className="object-cover w-full h-full" 
+                            />
+                        </div>
+                        <div>
+                            <p className="font-semibold">{reviewModalContent.name}</p>
+                            <p className="text-sm text-gray-500">{timeAgo(reviewModalContent.date)}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center space-x-1 mb-4">
+                        {[...Array(5)].map((_, index) => (
+                            <AiFillStar 
+                                key={index} 
+                                className={index < (reviewModalContent.ranking || 0) ? 'text-yellow-500' : 'text-gray-300'} 
+                            />
+                        ))}
+                        <span className="text-sm text-gray-500">
+                            {reviewModalContent.ranking !== undefined ? `(${reviewModalContent.ranking.toFixed(1)})` : '(No rating)'}
+                        </span>
+                    </div>
+                    <div>{reviewModalContent.comment}</div>
+                </div>
+            </ShowMoreModal>
+        )}
+    
         {/* Show More Modal for larger screens */}
         {!isSmallScreen && isShowMoreModalOpen && (
             <ShowMoreModal
                 isOpen={isShowMoreModalOpen}
                 onClose={() => setIsShowMoreModalOpen(false)}
             >
-                <div className="p-4 text-gray-700">
+                <button
+                    className="absolute top-2 right-3 text-gray-600 text-2xl font-bold z-50"
+                    onClick={() => setIsShowMoreModalOpen(false)}
+                    aria-label="Close"
+                >
+                    <FiX className="text-2xl" />
+                </button>
+                <div className="p-4 text-gray-700 break-words">
                     {modalContent} {/* Show full review content */}
                 </div>
-                <button
-                    className="mt-4 text-blue-500 underline"
-                    onClick={() => setIsShowMoreModalOpen(false)} // Close the modal
-                >
-                    Close
-                </button>
             </ShowMoreModal>
         )}
     </>

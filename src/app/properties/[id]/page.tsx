@@ -20,6 +20,36 @@ import { FiX } from 'react-icons/fi';
 import { timeAgo } from '@/utils/dateUtils';
 
 
+interface Property {
+    id: string;
+    title: string;
+    guests?: number;
+    bedrooms?: string;
+    beds?: string;
+    baths?: string;
+    city?: string;
+    country?: string;
+    imageUrls?: string[];
+    details?: {
+      features?: string[];
+      description?: string;
+    };
+    houseRules?: string[];
+    services?: string[];
+    safetyFeatures?: string[];
+    userId?: string;
+  }
+
+
+interface Review {
+    name: string;
+    comment: string;
+    timestamp: Date; 
+    rating: number;
+    profileImageUrl?: string;
+  }
+
+
 type ShowMoreSection = 'description' | 'features' | 'houseRules' | 'services' | 'safetyFeatures';
 
 const PropertyDetail = () => {
@@ -33,7 +63,7 @@ const PropertyDetail = () => {
     const [selectedCheckOut, setSelectedCheckOut] = useState<string | null>(null);
     const [selectedGuests, setSelectedGuests] = useState<number>(1);
     const [host, setHost] = useState<any>(null);
-    const [reviews, setReviews] = useState([]);
+    const [reviews, setReviews] = useState<Review[]>([]);
     const [emblaRef, emblaApi] = EmblaCarouselReact({ loop: false, slidesToScroll: 1 });
     const { user } = useUser();
 const userId = user ? user.id : '';
@@ -78,23 +108,23 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         if (section === 'features') {
             modalContent = (
                 <ul className="space-y-1 mt-2">
-                    {property?.details?.features?.map((feature, index) => (
-                        <li key={index} className="text-gray-600">{feature}</li>
-                    ))}
-                </ul>
+                {property?.details?.features?.map((feature: string, index: number) => (
+                  <li key={index} className="text-gray-600">{feature}</li>
+                ))}
+              </ul>
             );
         } else if (section === 'houseRules') {
             modalContent = (
                 <ul className="space-y-1 mt-2">
-                    {property?.houseRules && property.houseRules.map((rule, index) => (
-                        <li key={index} className="text-gray-600">{rule}</li>
-                    ))}
+                   {property?.houseRules && property.houseRules.map((rule: string, index: number) => (
+  <li key={index} className="text-gray-600">{rule}</li>
+))}
                 </ul>
             );
         } else if (section === 'services') {
             modalContent = (
                 <ul className="space-y-1 mt-2">
-                    {property?.services && property.services.map((service, index) => (
+                    {property?.services && property.services.map((service: string, index: number) => (
                         <li key={index} className="text-gray-600">{service}</li>
                     ))}
                 </ul>
@@ -102,7 +132,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         } else if (section === 'safetyFeatures') {
             modalContent = (
                 <ul className="space-y-1 mt-2">
-                    {property?.safetyFeatures && property.safetyFeatures.map((feature, index) => (
+                    {property?.safetyFeatures && property.safetyFeatures.map((feature: string, index: number) => (
                         <li key={index} className="text-gray-600">{feature}</li>
                     ))}
                 </ul>
@@ -124,7 +154,8 @@ const [reviewModalContent, setReviewModalContent] = useState<{
                 const docSnap = await getDoc(docRef);
     
                 if (docSnap.exists()) {
-                    const propertyData = { id: docSnap.id, ...docSnap.data() };
+                    const propertyData = { id: docSnap.id, ...docSnap.data() } as Property;
+
                     
                     // Set property data
                     setProperty({
@@ -159,25 +190,18 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         const fetchReviews = async () => {
             try {
                 if (!property?.id) return;
-    
-                const reviewsData = await getReviewsForProperty(property.id);
-    
-                // Filter out reviews that don't have a comment, only for displaying purposes
-                const reviewsWithComments = reviewsData.filter((review) => review.comment && review.comment.trim() !== "");
-    
-                setReviews(reviewsWithComments);
-    
-                // Calculate average rating and total count using all reviews
-                const totalRatings = reviewsData.length;
-                const averageRating = totalRatings > 0
-                    ? reviewsData.reduce((sum, review) => sum + review.rating, 0) / totalRatings
-                    : 0;
-    
-                setProperty((prev) => ({
-                    ...prev,
-                    averageRating: averageRating.toFixed(1),
-                    totalRatings
+        
+                const reviewsData = (await getReviewsForProperty(property.id)) as Array<Partial<Review>>;
+        
+                const reviewsWithComments: Review[] = reviewsData.map((review) => ({
+                    name: review.name || 'Anonymous',
+                    profileImageUrl: review.profileImageUrl || '/default-profile.png',
+                    comment: review.comment || '', // Default to empty string
+                    timestamp: review.timestamp || new Date(), // Default to current date
+                    rating: review.rating ?? 0, // Default to 0
                 }));
+        
+                setReviews(reviewsWithComments);
             } catch (error) {
                 console.error("Error fetching reviews:", error);
             }
@@ -324,7 +348,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
                         <ul className="space-y-1 mt-2">
                         {property?.features &&
     property.features.slice(0, showMore.features ? property.features.length : maxItemsToShow.features)
-    .map((feature, index) => (
+    .map((feature: string, index: number) => (
         <li key={index} className="text-gray-600">{feature}</li>
     ))}
                         </ul>
@@ -347,7 +371,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
     <ul className="space-y-1 mt-2">
         {property?.houseRules && property.houseRules
             .slice(0, showMore.houseRules ? property.houseRules.length : maxItemsToShow.houseRules)
-            .map((rule, index) => (
+            .map((rule: string, index: number) => (
                 <li key={index} className="text-gray-600">{rule}</li>
             ))
         }
@@ -372,7 +396,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         {property?.services &&
             property.services
                 .slice(0, showMore.services ? property.services.length : maxItemsToShow.services)
-                .map((service, index) => (
+                .map((service: string, index: number) => (
                     <li key={index} className="text-gray-600">{service}</li>
                 ))
         }
@@ -397,7 +421,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         {property?.safetyFeatures &&
             property.safetyFeatures
                 .slice(0, showMore.safetyFeatures ? property.safetyFeatures.length : maxItemsToShow.safetyFeatures)
-                .map((feature, index) => (
+                .map((feature: string, index: number) => (
                     <li key={index} className="text-gray-600">{feature}</li>
                 ))
         }
@@ -418,6 +442,9 @@ const [reviewModalContent, setReviewModalContent] = useState<{
 {/* Reviews Section */}
 <div className="mt-6">
   <h2 className="text-lg font-bold">Reviews</h2>
+  {reviews.length === 0 && (
+  <p className="text-gray-500">No reviews available yet.</p>
+)}
 
   {/* Restrict the slider to the content width */}
   <div className="overflow-hidden w-full max-w-5xl mx-auto"> {/* Ensures the slider is within the container */}
@@ -428,15 +455,15 @@ const [reviewModalContent, setReviewModalContent] = useState<{
 <ReviewCard
     name={review.name}
     review={review.comment}
-    date={review.timestamp.toDate()}
+    date={review.timestamp.toISOString()}
     ranking={review.rating}
     profileImageUrl={review.profileImageUrl}
     onShowMore={() => {
         setReviewModalContent({
             name: review.name,
             comment: review.comment,
-            profileImageUrl: review.profileImageUrl,
-            date: review.timestamp.toDate(),
+            profileImageUrl: review.profileImageUrl || '/default-profile.png',
+            date: review.timestamp, 
             ranking: review.rating,
         });
         setIsReviewModalOpen(true);
@@ -518,7 +545,8 @@ const [reviewModalContent, setReviewModalContent] = useState<{
                         </div>
                         <div>
                             <p className="font-semibold">{reviewModalContent.name}</p>
-                            <p className="text-sm text-gray-500">{timeAgo(reviewModalContent.date)}</p>
+                            <p className="text-sm text-gray-500">{timeAgo(reviewModalContent.date.toISOString())}</p>
+
                         </div>
                     </div>
                     <div className="flex items-center space-x-1 mb-4">

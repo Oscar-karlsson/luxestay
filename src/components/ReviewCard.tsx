@@ -4,19 +4,19 @@ import { AiFillStar } from 'react-icons/ai';
 import { timeAgo } from '@/utils/dateUtils';
 
 interface ReviewCardProps {
-    name: string;
-    review: string;
-    date: string;
-    ranking?: number;
-    profileImageUrl?: string;
-    onShowMore: (review: string) => void; // Add this prop
-  }
+  name: string;
+  review: string;
+  date: string;
+  ranking?: number;
+  profileImageUrl?: string;
+  onShowMore: (review: string) => void; 
+  isFullContent?: boolean;  
+}
   
-  const ReviewCard: React.FC<ReviewCardProps> = ({ name, review, date, ranking, profileImageUrl, onShowMore }) => {
-    const maxLength = 100; // Maximum number of characters before truncating
-  
-    // Show truncated review if it's longer than maxLength
-    const truncatedReview = review.length > maxLength ? `${review.substring(0, maxLength)}...` : review;
+const ReviewCard: React.FC<ReviewCardProps> = ({ name, review, date, ranking, profileImageUrl, onShowMore, isFullContent = false }) => {
+  const maxLength = 100;
+  const displayReview = isFullContent ? review : review.length > maxLength ? `${review.substring(0, maxLength)}...` : review;
+
   
     return (
       <div className="review-card bg-gray-100 p-4 rounded-lg shadow-md space-y-3 h-64 overflow-hidden">
@@ -31,35 +31,35 @@ interface ReviewCardProps {
     className="object-cover w-full h-full"
   />
 </div>
-          <div>
-            <p className="font-semibold">{name}</p>
-            <p className="text-sm text-gray-500">{timeAgo(date)}</p>
-          </div>
+<div>
+    <p className="font-semibold">{name}</p>
+    <div className="flex items-center space-x-1 text-sm text-gray-500">
+        <div className="flex items-center">
+            {[...Array(5)].map((_, index) => (
+                <AiFillStar
+                    key={index}
+                    className={index < (ranking || 0) ? 'text-yellow-500' : 'text-gray-300'}
+                />
+            ))}
+        </div>
+        <span className="mx-1">•</span>
+        <span>{timeAgo(date)}</span>
+    </div>
+</div>
         </div>
   
         <div className="text-primaryText break-words">
-          {truncatedReview}
-        </div>
+    {displayReview}
+</div>
   
         {/* Show More button */}
-        {review.length > maxLength && (
-          <button onClick={() => onShowMore(review)} className="text-accent text-b1-mobile font-semi-bold underline text-sm" aria-label={`Show full review for ${name}`}>
-          Show More
-        </button>
-        )}
+        {review.length > maxLength && !isFullContent && (
+    <button onClick={() => onShowMore(review)} className="text-accent text-b1-mobile font-semi-bold underline text-sm" aria-label={`Show full review for ${name}`}>
+        Show More
+    </button>
+)}
   
-        <div className="flex items-center space-x-1">
-          {/* Display ranking as stars */}
-          {[...Array(5)].map((_, index) => (
-            <AiFillStar
-              key={index}
-              className={index < (ranking || 0) ? 'text-yellow-500' : 'text-gray-300'}
-            />
-          ))}
-          <span className="text-sm text-gray-500">
-            {ranking !== undefined && ranking !== null ? `(${ranking.toFixed(1)})` : '(No rating)'}
-          </span>
-        </div>
+        
       </div>
     );
   };

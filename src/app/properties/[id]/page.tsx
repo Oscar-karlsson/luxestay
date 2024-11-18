@@ -18,36 +18,7 @@ import { useUser } from '@clerk/clerk-react';
 import { getReviewsForProperty } from '@/services/reviewService';
 import { FiX } from 'react-icons/fi';
 import { timeAgo } from '@/utils/dateUtils';
-
-
-interface Property {
-    id: string;
-    title: string;
-    guests?: number;
-    bedrooms?: string;
-    beds?: string;
-    baths?: string;
-    city?: string;
-    country?: string;
-    imageUrls?: string[];
-    details?: {
-      features?: string[];
-      description?: string;
-    };
-    houseRules?: string[];
-    services?: string[];
-    safetyFeatures?: string[];
-    userId?: string;
-  }
-
-
-interface Review {
-    name: string;
-    comment: string;
-    timestamp: Date; 
-    rating: number;
-    profileImageUrl?: string;
-  }
+import { FiChevronDown } from 'react-icons/fi';
 
 
 type ShowMoreSection = 'description' | 'features' | 'houseRules' | 'services' | 'safetyFeatures';
@@ -63,10 +34,14 @@ const PropertyDetail = () => {
     const [selectedCheckOut, setSelectedCheckOut] = useState<string | null>(null);
     const [selectedGuests, setSelectedGuests] = useState<number>(1);
     const [host, setHost] = useState<any>(null);
-    const [reviews, setReviews] = useState<Review[]>([]);
+    const [reviews, setReviews] = useState([]);
     const [emblaRef, emblaApi] = EmblaCarouselReact({ loop: false, slidesToScroll: 1 });
     const { user } = useUser();
+    const reviewDisplayLimit = 1;
+    const [isAllReviewsModalOpen, setIsAllReviewsModalOpen] = useState(false);
 const userId = user ? user.id : '';
+const [sortOption, setSortOption] = useState("mostRecent");
+const [isSortModalOpen, setIsSortModalOpen] = useState(false);
 const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 const [reviewModalContent, setReviewModalContent] = useState<{
     name: string;
@@ -95,6 +70,13 @@ const [reviewModalContent, setReviewModalContent] = useState<{
     };
 
 
+    // Sort reviews based on the selected option
+    const sortedReviews = [...reviews].sort((a, b) => {
+        if (sortOption === "highestRating") return b.rating - a.rating;
+        if (sortOption === "lowestRating") return a.rating - b.rating;
+        if (sortOption === "mostRecent") return b.timestamp.toDate() - a.timestamp.toDate();
+    });
+
      // Define the function to navigate to the booking review page
      const handleRequestBooking = () => {
         const imageUrl = property.imageUrls?.[0] || '/default-image.jpg';
@@ -108,23 +90,23 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         if (section === 'features') {
             modalContent = (
                 <ul className="space-y-1 mt-2">
-                {property?.details?.features?.map((feature: string, index: number) => (
-                  <li key={index} className="text-gray-600">{feature}</li>
-                ))}
-              </ul>
+                    {property?.details?.features?.map((feature, index) => (
+                        <li key={index} className="text-gray-600">{feature}</li>
+                    ))}
+                </ul>
             );
         } else if (section === 'houseRules') {
             modalContent = (
                 <ul className="space-y-1 mt-2">
-                   {property?.houseRules && property.houseRules.map((rule: string, index: number) => (
-  <li key={index} className="text-gray-600">{rule}</li>
-))}
+                    {property?.houseRules && property.houseRules.map((rule, index) => (
+                        <li key={index} className="text-gray-600">{rule}</li>
+                    ))}
                 </ul>
             );
         } else if (section === 'services') {
             modalContent = (
                 <ul className="space-y-1 mt-2">
-                    {property?.services && property.services.map((service: string, index: number) => (
+                    {property?.services && property.services.map((service, index) => (
                         <li key={index} className="text-gray-600">{service}</li>
                     ))}
                 </ul>
@@ -132,7 +114,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         } else if (section === 'safetyFeatures') {
             modalContent = (
                 <ul className="space-y-1 mt-2">
-                    {property?.safetyFeatures && property.safetyFeatures.map((feature: string, index: number) => (
+                    {property?.safetyFeatures && property.safetyFeatures.map((feature, index) => (
                         <li key={index} className="text-gray-600">{feature}</li>
                     ))}
                 </ul>
@@ -154,8 +136,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
                 const docSnap = await getDoc(docRef);
     
                 if (docSnap.exists()) {
-                    const propertyData = { id: docSnap.id, ...docSnap.data() } as Property;
-
+                    const propertyData = { id: docSnap.id, ...docSnap.data() };
                     
                     // Set property data
                     setProperty({
@@ -190,18 +171,25 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         const fetchReviews = async () => {
             try {
                 if (!property?.id) return;
-        
-                const reviewsData = (await getReviewsForProperty(property.id)) as Array<Partial<Review>>;
-        
-                const reviewsWithComments: Review[] = reviewsData.map((review) => ({
-                    name: review.name || 'Anonymous',
-                    profileImageUrl: review.profileImageUrl || '/default-profile.png',
-                    comment: review.comment || '', // Default to empty string
-                    timestamp: review.timestamp || new Date(), // Default to current date
-                    rating: review.rating ?? 0, // Default to 0
-                }));
-        
+    
+                const reviewsData = await getReviewsForProperty(property.id);
+    
+                // Filter out reviews that don't have a comment, only for displaying purposes
+                const reviewsWithComments = reviewsData.filter((review) => review.comment && review.comment.trim() !== "");
+    
                 setReviews(reviewsWithComments);
+    
+                // Calculate average rating and total count using all reviews
+                const totalRatings = reviewsData.length;
+                const averageRating = totalRatings > 0
+                    ? reviewsData.reduce((sum, review) => sum + review.rating, 0) / totalRatings
+                    : 0;
+    
+                setProperty((prev) => ({
+                    ...prev,
+                    averageRating: averageRating.toFixed(1),
+                    totalRatings
+                }));
             } catch (error) {
                 console.error("Error fetching reviews:", error);
             }
@@ -226,7 +214,10 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         };
     }, []); 
 
-    
+    useEffect(() => {
+        console.log("isSortModalOpen has changed:", isSortModalOpen);
+    }, [isSortModalOpen]);
+
     const content = (
         <div className="md:max-w-5xl md:mx-auto pb-16">
             {/* Title for larger screens */}
@@ -348,7 +339,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
                         <ul className="space-y-1 mt-2">
                         {property?.features &&
     property.features.slice(0, showMore.features ? property.features.length : maxItemsToShow.features)
-    .map((feature: string, index: number) => (
+    .map((feature, index) => (
         <li key={index} className="text-gray-600">{feature}</li>
     ))}
                         </ul>
@@ -371,7 +362,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
     <ul className="space-y-1 mt-2">
         {property?.houseRules && property.houseRules
             .slice(0, showMore.houseRules ? property.houseRules.length : maxItemsToShow.houseRules)
-            .map((rule: string, index: number) => (
+            .map((rule, index) => (
                 <li key={index} className="text-gray-600">{rule}</li>
             ))
         }
@@ -396,7 +387,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         {property?.services &&
             property.services
                 .slice(0, showMore.services ? property.services.length : maxItemsToShow.services)
-                .map((service: string, index: number) => (
+                .map((service, index) => (
                     <li key={index} className="text-gray-600">{service}</li>
                 ))
         }
@@ -421,7 +412,7 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         {property?.safetyFeatures &&
             property.safetyFeatures
                 .slice(0, showMore.safetyFeatures ? property.safetyFeatures.length : maxItemsToShow.safetyFeatures)
-                .map((feature: string, index: number) => (
+                .map((feature, index) => (
                     <li key={index} className="text-gray-600">{feature}</li>
                 ))
         }
@@ -442,9 +433,6 @@ const [reviewModalContent, setReviewModalContent] = useState<{
 {/* Reviews Section */}
 <div className="mt-6">
   <h2 className="text-lg font-bold">Reviews</h2>
-  {reviews.length === 0 && (
-  <p className="text-gray-500">No reviews available yet.</p>
-)}
 
   {/* Restrict the slider to the content width */}
   <div className="overflow-hidden w-full max-w-5xl mx-auto"> {/* Ensures the slider is within the container */}
@@ -455,18 +443,19 @@ const [reviewModalContent, setReviewModalContent] = useState<{
 <ReviewCard
     name={review.name}
     review={review.comment}
-    date={review.timestamp.toISOString()}
+    date={review.timestamp.toDate()}
     ranking={review.rating}
     profileImageUrl={review.profileImageUrl}
+    isFullContent={false} // Ensures review is truncated with "Show More" button
     onShowMore={() => {
         setReviewModalContent({
             name: review.name,
             comment: review.comment,
-            profileImageUrl: review.profileImageUrl || '/default-profile.png',
-            date: review.timestamp, 
+            profileImageUrl: review.profileImageUrl,
+            date: review.timestamp.toDate(),
             ranking: review.rating,
         });
-        setIsReviewModalOpen(true);
+        setIsReviewModalOpen(true); // Opens modal for full review
     }}
 />
           </div>
@@ -474,6 +463,17 @@ const [reviewModalContent, setReviewModalContent] = useState<{
       </div>
     </div>
   </div>
+
+    {/* Show More button for reviews */}
+    {reviews.length > reviewDisplayLimit && (
+        <button
+  onClick={() => setIsAllReviewsModalOpen(true)}  // Opens the new All Reviews modal
+  className="text-primaryButton border border-primaryButton py-2 px-4 rounded-lg mt-2 mb-8 mx-auto block active:scale-95 transition-transform duration-75"
+>
+  Show More Reviews
+</button>
+  )}
+
 </div>
                 </div>
 
@@ -528,61 +528,265 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         {!isSmallScreen && content}
 
         {isReviewModalOpen && reviewModalContent && (
-            <ShowMoreModal
-                isOpen={isReviewModalOpen}
-                onClose={() => setIsReviewModalOpen(false)}
-            >
-                <div className="p-4 text-gray-700 break-words">
-                    <div className="flex items-center space-x-4 mb-4">
-                        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                            <Image 
-                                src={reviewModalContent.profileImageUrl || '/profile.png'} 
-                                alt={`${reviewModalContent.name}'s profile picture`} 
-                                width={48} 
-                                height={48} 
-                                className="object-cover w-full h-full" 
-                            />
-                        </div>
-                        <div>
-                            <p className="font-semibold">{reviewModalContent.name}</p>
-                            <p className="text-sm text-gray-500">{timeAgo(reviewModalContent.date.toISOString())}</p>
+    <ShowMoreModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+    >
+<ReviewCard
+    name={reviewModalContent.name}
+    review={reviewModalContent.comment}
+    date={reviewModalContent.date}
+    ranking={reviewModalContent.ranking}
+    profileImageUrl={reviewModalContent.profileImageUrl}
+    onShowMore={() => {}} // No action needed in modal
+    isFullContent={true}  // Full review content shown in modal
+/>
+    </ShowMoreModal>
+)}
 
-                        </div>
+
+        {/* Show More Modal for All Reviews */}
+        {isAllReviewsModalOpen && (
+    <ShowMoreModal
+        isOpen={isAllReviewsModalOpen}
+        onClose={() => setIsAllReviewsModalOpen(false)}
+    >
+        <div className={`${isSmallScreen ? "fixed top-0 left-0 w-full h-full bg-white z-50" : ""} p-4 overflow-y-auto h-full`}>
+            {isSmallScreen ? (
+                <button
+                    className="absolute top-2 left-3 text-gray-600 text-2xl font-bold z-50"
+                    onClick={() => setIsAllReviewsModalOpen(false)}
+                    aria-label="Close"
+                >
+                    <IoIosArrowBack />
+                </button>
+            ) : (
+                <button
+                    className="absolute top-2 right-3 text-gray-600 text-2xl font-bold z-50"
+                    onClick={() => setIsAllReviewsModalOpen(false)}
+                    aria-label="Close"
+                >
+                    <FiX />
+                </button>
+            )}
+            
+            <h2 className="text-lg font-bold text-center mb-4">All Reviews</h2>
+            <div className="space-y-4">
+
+            <div className="flex justify-end mb-4 w-full">
+    {!isSmallScreen && (
+        <div className="relative w-48">
+            <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="appearance-none border border-gray-300 rounded-2xl px-4 py-2 w-full pr-10 bg-white shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                <option value="mostRecent">Most Recent</option>
+                <option value="highestRating">Highest Rating</option>
+                <option value="lowestRating">Lowest Rating</option>
+            </select>
+            <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 pointer-events-none text-lg" />
+        </div>
+    )}
+
+    {isSmallScreen && (
+     <button
+     onClick={() => {
+        console.log("Sort button clicked");
+        setIsSortModalOpen(true);
+        console.log("isSortModalOpen:", isSortModalOpen);
+    }}
+            className="appearance-none border border-gray-300 rounded-2xl px-4 py-2 w-full bg-white shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-left"
+        >
+            {sortOption === "mostRecent" && "Most Recent"}
+            {sortOption === "highestRating" && "Highest Rating"}
+            {sortOption === "lowestRating" && "Lowest Rating"}
+            <FiChevronDown className="inline-block ml-2 text-gray-600 text-lg" />
+        </button>
+    )}
+</div>
+{sortedReviews.map((review, index) => (
+    <ReviewCard
+        key={index}
+        name={review.name}
+        review={review.comment}
+        date={review.timestamp.toDate()}
+        ranking={review.rating}
+        profileImageUrl={review.profileImageUrl}
+        isFullContent={true}
+        onShowMore={() => {}}
+    />
+))}
+            {isSortModalOpen && (
+                <div className="fixed inset-0 z-[100] bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-white rounded-lg p-6 w-64">
+                        <h2 className="text-center font-bold text-lg mb-4">Sort by</h2>
+                        <ul className="space-y-4">
+                            <li
+                                onClick={() => {
+                                    setSortOption("mostRecent");
+                                    setIsSortModalOpen(false);
+                                }}
+                                className="flex justify-between items-center cursor-pointer"
+                            >
+                                <span>Most Recent</span>
+                                <div
+    className={`w-4 h-4 rounded-full ${sortOption === "mostRecent" ? "bg-black" : "bg-gray-300 border border-gray-400"}`}
+/>
+                            </li>
+                            <li
+                                onClick={() => {
+                                    setSortOption("highestRating");
+                                    setIsSortModalOpen(false);
+                                }}
+                                className="flex justify-between items-center cursor-pointer"
+                            >
+                                <span>Highest Rated</span>
+                                <div
+    className={`w-4 h-4 rounded-full ${sortOption === "highestRating" ? "bg-black" : "bg-gray-300 border border-gray-400"}`}
+/>
+                            </li>
+                            <li
+                                onClick={() => {
+                                    setSortOption("lowestRating");
+                                    setIsSortModalOpen(false);
+                                }}
+                                className="flex justify-between items-center cursor-pointer"
+                            >
+                                <span>Lowest Rated</span>
+                                <div
+    className={`w-4 h-4 rounded-full ${sortOption === "lowestRating" ? "bg-black" : "bg-gray-300 border border-gray-400"}`}
+/>
+                            </li>
+                        </ul>
+                        <button
+                            onClick={() => setIsSortModalOpen(false)}
+                            className="w-full mt-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg"
+                        >
+                            Close
+                        </button>
                     </div>
-                    <div className="flex items-center space-x-1 mb-4">
-                        {[...Array(5)].map((_, index) => (
-                            <AiFillStar 
-                                key={index} 
-                                className={index < (reviewModalContent.ranking || 0) ? 'text-yellow-500' : 'text-gray-300'} 
-                            />
-                        ))}
-                        <span className="text-sm text-gray-500">
-                            {reviewModalContent.ranking !== undefined ? `(${reviewModalContent.ranking.toFixed(1)})` : '(No rating)'}
-                        </span>
-                    </div>
-                    <div>{reviewModalContent.comment}</div>
                 </div>
-            </ShowMoreModal>
-        )}
-    
+            )}
+        </div>
+    </div>
+    </ShowMoreModal>
+)}
+
         {/* Show More Modal for larger screens */}
         {!isSmallScreen && isShowMoreModalOpen && (
             <ShowMoreModal
                 isOpen={isShowMoreModalOpen}
                 onClose={() => setIsShowMoreModalOpen(false)}
             >
-                <button
-                    className="absolute top-2 right-3 text-gray-600 text-2xl font-bold z-50"
-                    onClick={() => setIsShowMoreModalOpen(false)}
-                    aria-label="Close"
+        <button
+    className="absolute top-2 left-3 md:right-3 text-gray-600 text-2xl font-bold z-50"
+    onClick={() => setIsAllReviewsModalOpen(false)}
+    aria-label="Close"
+>
+    {isSmallScreen ? <IoIosArrowBack className="text-2xl" /> : <FiX className="text-2xl" />}
+</button>
+
+{isSortModalOpen && (
+    <div className="fixed inset-0 z-[100] bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg p-6 w-64">
+            <h2 className="text-center font-bold text-lg mb-4">Sort by</h2>
+            <ul className="space-y-4">
+                <li
+                    onClick={() => {
+                        setSortOption("mostRecent");
+                        setIsSortModalOpen(false);
+                    }}
+                    className="flex justify-between items-center cursor-pointer"
                 >
-                    <FiX className="text-2xl" />
-                </button>
+                    <span>Most Recent</span>
+                    {sortOption === "mostRecent" && <div className="w-3 h-3 bg-black rounded-full" />}
+                </li>
+                <li
+                    onClick={() => {
+                        setSortOption("highestRating");
+                        setIsSortModalOpen(false);
+                    }}
+                    className="flex justify-between items-center cursor-pointer"
+                >
+                    <span>Highest Rated</span>
+                    {sortOption === "highestRating" && <div className="w-3 h-3 bg-black rounded-full" />}
+                </li>
+                <li
+                    onClick={() => {
+                        setSortOption("lowestRating");
+                        setIsSortModalOpen(false);
+                    }}
+                    className="flex justify-between items-center cursor-pointer"
+                >
+                    <span>Lowest Rated</span>
+                    {sortOption === "lowestRating" && <div className="w-3 h-3 bg-black rounded-full" />}
+                </li>
+            </ul>
+            <button
+                onClick={() => setIsSortModalOpen(false)}
+                className="w-full mt-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg"
+            >
+                Close
+            </button>
+        </div>
+    </div>
+)}
                 <div className="p-4 text-gray-700 break-words">
                     {modalContent} {/* Show full review content */}
                 </div>
             </ShowMoreModal>
         )}
+
+{isSortModalOpen && (
+    <div className="fixed inset-0 z-[100] bg-black bg-opacity-50 flex items-center justify-center">
+
+        <div className="bg-white rounded-lg p-6 w-64">
+            <h2 className="text-center font-bold text-lg mb-4">Sort by</h2>
+            <hr className="mb-4" />
+            <ul className="space-y-4">
+                <li
+                    onClick={() => {
+                        setSortOption("mostRecent");
+                        setIsSortModalOpen(false);
+                    }}
+                    className="flex justify-between items-center cursor-pointer"
+                >
+                    <span>Most Recent</span>
+                    {sortOption === "mostRecent" && <div className="w-3 h-3 bg-black rounded-full" />}
+                </li>
+                <li
+                    onClick={() => {
+                        setSortOption("highestRating");
+                        setIsSortModalOpen(false);
+                    }}
+                    className="flex justify-between items-center cursor-pointer"
+                >
+                    <span>Highest Rated</span>
+                    {sortOption === "highestRating" && <div className="w-3 h-3 bg-black rounded-full" />}
+                </li>
+                <li
+                    onClick={() => {
+                        setSortOption("lowestRating");
+                        setIsSortModalOpen(false);
+                    }}
+                    className="flex justify-between items-center cursor-pointer"
+                >
+                    <span>Lowest Rated</span>
+                    {sortOption === "lowestRating" && <div className="w-3 h-3 bg-black rounded-full" />}
+                </li>
+            </ul>
+            <hr className="mt-4" />
+            <button
+                onClick={() => setIsSortModalOpen(false)}
+                className="w-full mt-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg"
+            >
+                Close
+            </button>
+        </div>
+    </div>
+)}
+
     </>
 );
 };

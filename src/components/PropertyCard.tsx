@@ -21,6 +21,7 @@ interface PropertyCardProps {
   isFavorite: boolean;
   userId: string;
   imageUrls: string[];
+  requireLogin: () => void; 
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -34,6 +35,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   isFavorite,
   userId,
   imageUrls,
+  requireLogin,
 }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -106,7 +108,12 @@ const [atEnd, setAtEnd] = useState(false);
       
     {/* Favorite Star Icon - Outside Link */}
     <div className="absolute top-2 right-2 z-10" onClick={(event) => event.stopPropagation()}>
-    <FavoriteStar userId={userId} propertyId={id.toString()} isFavorite={isFavorite} />
+    <FavoriteStar
+          userId={userId}
+          propertyId={id.toString()}
+          isFavorite={isFavorite}
+          requireLogin={requireLogin} 
+        />
   </div>
 
     {/* Link wraps the rest of the card */}

@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import PropertyCard from '../components/PropertyCard';
+import PropertyCard from '../../components/PropertyCard';
 import { collection, getDocs } from 'firebase/firestore'; // Import Firestore methods
 import { firestore } from '@/utils/firebase'; // Import Firebase setup
 import SearchBar from '@/components/SearchBar';
@@ -8,6 +8,8 @@ import { getReviewsForProperty } from '@/services/reviewService';
 import { calculateRatingData } from '@/utils/ratingUtils';
 import { useSearch } from '@/context/SearchContext';
 import FilterModal from '@/components/FilterModal';
+import { useUser, SignIn } from '@clerk/clerk-react';
+import { useSignInModal } from '@/components/SignInModalContext';
 
 const Explore = () => {
   const [properties, setProperties] = useState<any[]>([]);
@@ -16,6 +18,16 @@ const Explore = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 const openFilterModal = () => setIsFilterModalOpen(true);
 const closeFilterModal = () => setIsFilterModalOpen(false);
+const { showSignInModal, setShowSignInModal } = useSignInModal();
+const closeModal = () => setShowSignInModal(false);
+const { user } = useUser();
+
+const requireLogin = () => {
+  if (!user) {
+    setShowSignInModal(true);
+    console.log("requireLogin called: opening sign-in modal");
+  }
+};
   
 
   // Fetch property data from Firestore
@@ -116,6 +128,7 @@ useEffect(() => {
                 isFavorite={property.isFavorite || false}
                 userId={property.userId}
                 imageUrls={property.imageUrls || []}
+                requireLogin={requireLogin}
               />
             ))
           ) : (
@@ -125,6 +138,22 @@ useEffect(() => {
 <FilterModal isOpen={isFilterModalOpen} onRequestClose={closeFilterModal} />
       </div>
     </div>
+
+    {showSignInModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+    <div className="relative">
+      <SignIn />
+      <button
+        onClick={() => setShowSignInModal(false)}
+        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+        aria-label="Close"
+        style={{ background: 'none', border: 'none', fontSize: '1.5rem', lineHeight: '1' }}
+      >
+        &times;
+      </button>
+    </div>
+  </div>
+)}
   </div>
 );
 };

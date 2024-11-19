@@ -5,7 +5,7 @@ import { useUser } from '@clerk/clerk-react';
 import React, { useEffect, useState } from 'react';
 import { getReviewsForProperty } from '@/services/reviewService';
 import { calculateRatingData } from '@/utils/ratingUtils';
-
+import { SignIn } from '@clerk/clerk-react';
 
 
 
@@ -31,7 +31,13 @@ const FavoritesPage = () => {
   const [favoriteProperties, setFavoriteProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
-
+  if (!user) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <SignIn />
+      </div>
+    );
+  }
 
 // Fetch favorite properties from Firestore for the current user
 useEffect(() => {

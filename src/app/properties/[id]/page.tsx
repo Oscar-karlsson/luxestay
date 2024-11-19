@@ -117,6 +117,8 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         router.push(`/book/${property.id}/review?checkIn=${selectedCheckIn}&checkOut=${selectedCheckOut}&guests=${selectedGuests}&price=${property.price}&title=${encodeURIComponent(property.title)}&location=${encodeURIComponent(property.city)}, ${encodeURIComponent(property.country)}&imageUrl=${encodeURIComponent(imageUrl)}`);
     };
 
+    
+
 
     // Function to scroll to the previous image in the carousel
     const scrollPrevImage = useCallback((event) => {

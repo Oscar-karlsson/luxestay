@@ -2,21 +2,30 @@
 import React, { useState, useEffect } from 'react';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { addFavorite, removeFavorite } from '@/services/favoritesService';
-import { useUser } from '@clerk/clerk-react'; // Import useUser from Clerk
+import { useUser, SignIn } from '@clerk/clerk-react';
 import { getDoc, doc } from 'firebase/firestore';
 import { firestore } from '@/utils/firebase';
+import { useSignInModal } from '@/components/SignInModalContext';
 
 interface FavoriteStarProps {
   propertyId: string;
   isFavorite: boolean;
   userId: string;
+  requireLogin: () => void;
 }
 
 const FavoriteStar: React.FC<FavoriteStarProps> = ({ propertyId, isFavorite }) => {
   const { user } = useUser(); // Get the current user
   const [favorite, setFavorite] = useState(isFavorite);
+  const { setShowSignInModal } = useSignInModal();
 
 
+  const requireLogin = () => {
+    if (!user) {
+      setShowSignInModal(true); // Opens the modal from the context
+      console.log("User is not logged in, opening sign-in modal");
+    }
+  };
 
   useEffect(() => {
     const fetchFavoriteState = async () => {
@@ -32,7 +41,8 @@ const FavoriteStar: React.FC<FavoriteStarProps> = ({ propertyId, isFavorite }) =
 
   const handleToggleFavorite = async () => {
     if (!user) {
-      console.error("User not authenticated");
+      console.log("User is not logged in, calling requireLogin");
+      requireLogin(); // Calls requireLogin if user is not authenticated
       return;
     }
 

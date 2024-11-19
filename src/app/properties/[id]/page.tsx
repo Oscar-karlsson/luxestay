@@ -1,10 +1,9 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback  } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/utils/firebase';
 import { AiFillStar } from 'react-icons/ai';
-import { IoIosArrowBack } from "react-icons/io";
 import FavoriteStar from '@/components/FavoriteStar';
 import BookingBarSmall from '@/components/BookingBarSmall';
 import BookingBoxLarge from '@/components/BookingBoxLarge';
@@ -19,6 +18,11 @@ import { getReviewsForProperty } from '@/services/reviewService';
 import { FiX } from 'react-icons/fi';
 import { timeAgo } from '@/utils/dateUtils';
 import { FiChevronDown } from 'react-icons/fi';
+import Modal from 'react-modal';
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+
+
+
 
 
 type ShowMoreSection = 'description' | 'features' | 'houseRules' | 'services' | 'safetyFeatures';
@@ -35,7 +39,30 @@ const PropertyDetail = () => {
     const [selectedGuests, setSelectedGuests] = useState<number>(1);
     const [host, setHost] = useState<any>(null);
     const [reviews, setReviews] = useState([]);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const openImageModal = () => setIsImageModalOpen(true);  
+    const closeImageModal = () => setIsImageModalOpen(false);  
     const [emblaRef, emblaApi] = EmblaCarouselReact({ loop: false, slidesToScroll: 1 });
+    const [imageCarouselRef, imageCarouselApi] = EmblaCarouselReact({ loop: false });
+// State to track if carousel is at the start or end
+const [atStart, setAtStart] = useState(true);
+const [atEnd, setAtEnd] = useState(false);
+
+// Update `atStart` and `atEnd` based on carousel scroll position
+const onSelect = useCallback(() => {
+    if (!imageCarouselApi) return;
+    setAtStart(!imageCarouselApi.canScrollPrev());  // `atStart` is true when no previous slide
+    setAtEnd(!imageCarouselApi.canScrollNext());    // `atEnd` is true when no next slide
+}, [imageCarouselApi]);
+
+// Attach `onSelect` to carousel's `select` event to handle start/end state on every slide change
+useEffect(() => {
+    if (!imageCarouselApi) return;
+    imageCarouselApi.on('select', onSelect);
+    onSelect();  // Initial check to set correct start/end state when component loads
+}, [imageCarouselApi, onSelect]);
+
+
     const { user } = useUser();
     const reviewDisplayLimit = 1;
     const [isAllReviewsModalOpen, setIsAllReviewsModalOpen] = useState(false);
@@ -50,6 +77,13 @@ const [reviewModalContent, setReviewModalContent] = useState<{
     date: Date;
     ranking: number;
 } | null>(null);
+
+   // Set Modal app element only on the client-side
+   useEffect(() => {
+    if (typeof window !== "undefined" && document.getElementById('__next')) {
+      Modal.setAppElement('#__next');  // Ensure the root element exists before setting
+    }
+  }, []);
 
     // Set initial "Show More" state for different sections
     const [showMore, setShowMore] = useState({
@@ -82,6 +116,41 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         const imageUrl = property.imageUrls?.[0] || '/default-image.jpg';
         router.push(`/book/${property.id}/review?checkIn=${selectedCheckIn}&checkOut=${selectedCheckOut}&guests=${selectedGuests}&price=${property.price}&title=${encodeURIComponent(property.title)}&location=${encodeURIComponent(property.city)}, ${encodeURIComponent(property.country)}&imageUrl=${encodeURIComponent(imageUrl)}`);
     };
+
+
+    // Function to scroll to the previous image in the carousel
+    const scrollPrevImage = useCallback((event) => {
+        event.stopPropagation();
+        if (imageCarouselApi) {
+            console.log("Image carousel API is initialized and ready.");
+        } else {
+            console.log("Image carousel API is not ready.");
+        }
+    }, [imageCarouselApi]);
+      
+      const scrollNextImage = useCallback((event) => {
+        event.stopPropagation();
+        if (imageCarouselApi) {
+          imageCarouselApi.scrollNext();
+        } else {
+          console.log("Image carousel API is not initialized");
+        }
+      }, [imageCarouselApi]);
+
+      useEffect(() => {
+        if (isImageModalOpen && imageCarouselApi) {
+            imageCarouselApi.reInit();
+            imageCarouselApi.scrollTo(0);
+        }
+    }, [isImageModalOpen, imageCarouselApi]);
+
+      useEffect(() => {
+        if (imageCarouselApi) {
+          console.log("Image carousel API is ready");
+        } else {
+          console.log("Image carousel API is not ready yet");
+        }
+      }, [imageCarouselApi]);
 
     // Function to set the content for the modal based on the section
     const handleShowMoreToggle = (section: ShowMoreSection | 'review', content: string = '') => {
@@ -198,6 +267,15 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         fetchReviews();
     }, [property?.id]);
 
+
+
+    const handlePrevClick = useCallback(() => {
+        imageCarouselApi && imageCarouselApi.scrollPrev();
+    }, [imageCarouselApi]);
+    
+    const handleNextClick = useCallback(() => {
+        imageCarouselApi && imageCarouselApi.scrollNext();
+    }, [imageCarouselApi]);
     
 
     // Check screen size on component mount
@@ -239,7 +317,8 @@ const [reviewModalContent, setReviewModalContent] = useState<{
     width={1200}  // Set the width as before
     height={800}  // Set the height as before
     priority // Adds priority for better performance on images above the fold
-    className="w-full h-auto object-cover max-h-96"
+    className="w-full h-auto object-cover max-h-96 cursor-pointer"  
+    onClick={openImageModal}
   />
 ) : (
     <div className="w-full h-48 bg-gray-300 flex items-center justify-center">
@@ -433,6 +512,9 @@ const [reviewModalContent, setReviewModalContent] = useState<{
 {/* Reviews Section */}
 <div className="mt-6">
   <h2 className="text-lg font-bold">Reviews</h2>
+  {reviews.length === 0 && (
+  <p className="text-gray-500">No reviews available yet.</p>
+)}
 
   {/* Restrict the slider to the content width */}
   <div className="overflow-hidden w-full max-w-5xl mx-auto"> {/* Ensures the slider is within the container */}
@@ -786,6 +868,62 @@ const [reviewModalContent, setReviewModalContent] = useState<{
         </div>
     </div>
 )}
+
+{isImageModalOpen && (
+    <Modal
+  isOpen={isImageModalOpen}
+  onRequestClose={closeImageModal}
+  shouldCloseOnOverlayClick={true}
+  contentLabel="Property Image Modal"
+  overlayClassName="image-modal-overlay"
+  className="image-modal-content"
+>
+
+
+  <div className="embla-image-carousel" ref={imageCarouselRef}>
+    {/* Render arrows only on larger screens */}
+    {!isSmallScreen && !atStart && ( // Only show if not at the start
+    <button
+        className="image-modal-arrow image-modal-arrow--prev"
+        onClick={handlePrevClick}
+    >
+        <IoIosArrowBack />
+    </button>
+)}
+
+<div className="embla-image-container">
+{property.imageUrls.map((url, index) => (
+    <div key={url} className="relative embla-image-slide">
+        <button
+            onClick={closeImageModal}
+            className="image-modal-close-btn"
+            aria-label="Close"
+        >
+            <FiX />
+        </button>
+        <Image
+            src={url}
+            alt={`Property Image ${index + 1}`}
+            width={600}
+            height={400}
+            className="image-modal-image"
+        />
+    </div>
+))}
+</div>
+
+{!isSmallScreen && !atEnd && ( // Only show if not at the end
+    <button
+        className="image-modal-arrow image-modal-arrow--next"
+        onClick={handleNextClick}
+    >
+        <IoIosArrowForward />
+    </button>
+)}
+  </div>
+</Modal>
+)}
+
 
     </>
 );

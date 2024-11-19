@@ -270,3 +270,126 @@ input[type="number"] {
     font-size: var(--font-size-b3-desktop) !important;
   }
 }
+
+
+/* IMG Modal Styles */
+
+.image-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw; /* Ensure full viewport width */
+  height: 100vh; /* Ensure full viewport height */
+  background-color: black !important; /* Make background solid black */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Transparent styling for modal content */
+.image-modal-content {
+  background: transparent; /* Remove any default white background */
+  width: 100%; /* Ensure it stretches fully */
+  height: 100%; /* Ensure full screen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Embla Image Carousel Wrapper */
+.embla-image-carousel {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Embla Image Container for slide positioning */
+.embla-image-container {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+
+/* Individual Slide */
+.embla-image-slide {
+  flex: 0 0 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* Styles for Image Modal Arrows */
+.image-modal-arrow {
+  position: absolute;
+  top: 50%;
+  font-size: 1.5rem;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  width: 40px; 
+  height: 40px;
+  z-index: 10;
+}
+
+
+
+.image-modal-close-btn {
+  position: absolute;
+  top: 20px; /* Adjust vertical position as needed */
+  right: 20px; /* Adjust horizontal position as needed */
+  color: white !important; /* Ensure color is white */
+  font-size: 2rem; /* Larger size for visibility */
+  background: rgba(0, 0, 0, 0.7); /* Dark background for contrast */
+  border: none;
+  padding: 8px;
+  border-radius: 50%; /* Circular button */
+  cursor: pointer;
+  z-index: 1100; /* Ensure it's on top */
+  transition: color 0.3s ease, background 0.3s ease;
+}
+
+/* Hover effect for the close button */
+.image-modal-close-btn:hover {
+  color: #ff0000; /* Red color on hover */
+  background: rgba(255, 255, 255, 0.2); /* Lighten background on hover */
+}
+
+
+/* Show image modal arrows on hover */
+.image-modal:hover .image-modal-arrow {
+  opacity: 1;
+}
+
+/* Positioning for previous and next arrows in the image modal */
+.image-modal-arrow.image-modal-arrow--prev {
+  left: 10px;
+}
+
+.image-modal-arrow.image-modal-arrow--next {
+  right: 10px;
+}
+
+/* Hide image modal arrows on smaller screens */
+@media (max-width: 1024px) {
+  .image-modal-arrow {
+    display: none;
+  }
+}
+
+
+
+/* Disable scrolling on body when modal is open */
+.body-no-scroll {
+  overflow: hidden;
+}

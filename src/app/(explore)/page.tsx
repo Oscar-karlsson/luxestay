@@ -10,6 +10,7 @@ import { useSearch } from '@/context/SearchContext';
 import FilterModal from '@/components/FilterModal';
 import { useUser, SignIn } from '@clerk/clerk-react';
 import { useSignInModal } from '@/components/SignInModalContext';
+import CardSkeleton from '@/components/skeletons/CardSkeleton';
 
 const Explore = () => {
   const [properties, setProperties] = useState<any[]>([]);
@@ -87,9 +88,18 @@ useEffect(() => {
   setSuggestions(locationSuggestions.slice(0, 5));
 }, [searchQuery, properties, setFilteredProperties, setSuggestions]);
   
-  if (loading) {
-    return <div>Loading properties...</div>; // Show loading indicator while data is being fetched
-  }
+if (loading) {
+  return (
+    <div className="container mx-auto px-6">
+    <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <CardSkeleton key={index} />
+      ))}
+    </div>
+  </div>
+  
+  );
+}
 
   return (
     <div>

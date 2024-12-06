@@ -6,6 +6,8 @@ import React, { useEffect, useState } from 'react';
 import { getReviewsForProperty } from '@/services/reviewService';
 import { calculateRatingData } from '@/utils/ratingUtils';
 import { SignIn } from '@clerk/clerk-react';
+import CardSkeleton from '@/components/skeletons/CardSkeleton';
+import FavoritesSmallScreenSkeleton from '@/components/skeletons/FavoritesSmallScreenSkeleton'; // Skeleton for smaller screens
 
 
 
@@ -31,13 +33,28 @@ const FavoritesPage = () => {
   const [favoriteProperties, setFavoriteProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
-  if (!user) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <SignIn />
-      </div>
-    );
-  }
+
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth <= 768); // Define breakpoint for small screens
+    };
+  
+    handleResize(); // Run on component mount
+    window.addEventListener('resize', handleResize); // Add event listener
+  
+    return () => {
+      window.removeEventListener('resize', handleResize); // Cleanup on unmount
+    };
+  }, []);
+  
+
+  
+
+
+
+
 
 // Fetch favorite properties from Firestore for the current user
 useEffect(() => {
@@ -72,9 +89,35 @@ useEffect(() => {
   fetchFavoritesWithRatings();
 }, [userId]);
 
-if (loading) {
-  return <div>Loading favorite properties...</div>;
+if (!user) {
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <SignIn />
+    </div>
+  );
 }
+
+if (loading) {
+  return (
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Your Favorite Properties</h1>
+      {isSmallScreen ? (
+        <div className="space-y-4">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <FavoritesSmallScreenSkeleton key={index} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <CardSkeleton key={index} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 
 

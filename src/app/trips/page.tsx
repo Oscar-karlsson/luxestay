@@ -6,6 +6,9 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from  '@/utils/firebase';
 import { useUser } from '@clerk/nextjs';
 import { cancelBooking } from '@/services/bookingService';
+import TripsSkeleton from '@/components/skeletons/TripsSkeleton';
+
+
 
 
 interface TripData {
@@ -107,26 +110,32 @@ const TripsPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Trip Cards */}
-      {filteredTrips.length > 0 ? (
-        filteredTrips.map(trip => (
-          <TripCard
-          key={trip.bookingId}
-          bookingId={trip.bookingId}
-          bookingDate={trip.bookingDate}
-          title={trip.title}
-          location={trip.location}
-          imageUrl={trip.imageUrl}
-          isCanceled={trip.isCanceled}
-          isCompleted={trip.isCompleted}
-          userId={trip.userId}  
-          propertyId={trip.propertyId}
-          onCancel={() => handleCancel(trip.bookingId)}
-        />
-        ))
-      ) : (
-        <NoTripsCard />
-      )}
+ {/* Trip Cards */}
+{loading ? (
+  <div className="space-y-4">
+    {Array.from({ length: 4 }).map((_, index) => (
+      <TripsSkeleton key={index} />
+    ))}
+  </div>
+) : filteredTrips.length > 0 ? (
+  filteredTrips.map(trip => (
+    <TripCard
+      key={trip.bookingId}
+      bookingId={trip.bookingId}
+      bookingDate={trip.bookingDate}
+      title={trip.title}
+      location={trip.location}
+      imageUrl={trip.imageUrl}
+      isCanceled={trip.isCanceled}
+      isCompleted={trip.isCompleted}
+      userId={trip.userId}
+      propertyId={trip.propertyId}
+      onCancel={() => handleCancel(trip.bookingId)}
+    />
+  ))
+) : (
+  <NoTripsCard />
+)}
     </div>
   );
 };
